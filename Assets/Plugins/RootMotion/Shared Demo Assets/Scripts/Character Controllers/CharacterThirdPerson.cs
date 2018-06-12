@@ -383,8 +383,9 @@ namespace RootMotion.Demos {
 
 			// if not jumping...
 			bool findGround = Time.time > jumpEndTime && velocityY < jumpPower * 0.5f;
-
-			if (findGround) {
+            if (Time.time > lastAirTime + 0.1f && onGround)
+                isBombed = false;
+            if (findGround) {
 				bool g = onGround;
 				onGround = false;
 
@@ -408,13 +409,12 @@ namespace RootMotion.Demos {
 
 					// Flag the character grounded
 					onGround = true;
-                    if (Time.time < lastAirTime + jumpRepeatDelayTime)
-                        isBombed = false;
                 }
 			}
+           
 
-			// Interpolate the additive velocity of the platform the character might be standing on
-			platformVelocity = Vector3.Lerp(platformVelocity, platformVelocityTarget, Time.deltaTime * platformFriction);
+            // Interpolate the additive velocity of the platform the character might be standing on
+            platformVelocity = Vector3.Lerp(platformVelocity, platformVelocityTarget, Time.deltaTime * platformFriction);
 
 			stickyForce = stickyForceTarget;//Mathf.Lerp(stickyForce, stickyForceTarget, Time.deltaTime * 5f);
 
