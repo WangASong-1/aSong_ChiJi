@@ -9,6 +9,7 @@ public class aSong_GraMP_40 : MonoBehaviour {
     [SerializeField] FullBodyBipedEffector[] effectors;
 
     private InteractionSystem interactionSystem;
+    private AimIK mAimIK;
     private Animator mAnim;
 
     public float magnitude = 1f;
@@ -20,6 +21,7 @@ public class aSong_GraMP_40 : MonoBehaviour {
         mAnim = GetComponent<Animator>();
 
         recoil = GetComponent<Recoil>();
+        mAimIK = GetComponent<AimIK>();
     }
 
     void GrabMP_40()
@@ -36,7 +38,8 @@ public class aSong_GraMP_40 : MonoBehaviour {
             foreach (FullBodyBipedEffector e in effectors)
             {
                 interactionSystem.StartInteraction(e, interactionObject, true);
-
+                mAimIK.solver.transform = interactionObject.transform.Find("Gun/FBXExport_Props:MP40/AimTransform");
+                mAimIK.solver.IKPositionWeight = 1f;
             }
         }
 
@@ -45,5 +48,8 @@ public class aSong_GraMP_40 : MonoBehaviour {
             Debug.Log("R键按下");
             recoil.Fire(magnitude);
         }
+
+        mAimIK.solver.IKPosition = transform.forward * 10f;
+        mAimIK.solver.Update();
     }
 }

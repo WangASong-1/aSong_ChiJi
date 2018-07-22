@@ -192,6 +192,7 @@ namespace RootMotion.FinalIK {
 			
 			/*
 			 * Positions the bone relative to it's 3 plane nodes
+             * 设置骨骼位置
 			 * */
 			public void PositionToPlane(IKSolverFullBody solver) {
 				transform.position = GetPlanePosition(solver);

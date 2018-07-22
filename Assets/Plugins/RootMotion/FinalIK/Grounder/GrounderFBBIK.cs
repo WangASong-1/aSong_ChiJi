@@ -96,8 +96,11 @@ namespace RootMotion.FinalIK {
 			weight = Mathf.Clamp(weight, 0f, 1f);
 			if (weight <= 0f) return;
 
-			if (initiated) return;
-			if (!IsReadyToInitiate()) return;
+            if (initiated) {
+                //OnSolverUpdate();
+                return;
+            }
+            if (!IsReadyToInitiate()) return;
 			
 			Initiate();
 		}
@@ -130,6 +133,7 @@ namespace RootMotion.FinalIK {
 		}
 
 		// Called before updating the main IK solver
+        // 这个要在主IK solver调用之前调用,避免覆盖主IK的计算
 		private void OnSolverUpdate() {
 			if (!firstSolve) return;
 			firstSolve = false;
@@ -138,7 +142,8 @@ namespace RootMotion.FinalIK {
 
 			if (OnPreGrounder != null) OnPreGrounder();
 
-			solver.Update();
+            //计算两只脚的站在地面上的Y轴偏移值,通过 solver(Grounding 里面的GroundingLeg 计算 脚Y轴偏移叠 然后通过 SetLegIK叠加到效应器中去)
+            solver.Update();
 
 			// Move the pelvis
 			ik.references.pelvis.position += solver.pelvis.IKOffset * weight;
@@ -146,8 +151,8 @@ namespace RootMotion.FinalIK {
 			// Set effector positionOffsets for the feet
 			SetLegIK(ik.solver.leftFootEffector, solver.legs[0]);
 			SetLegIK(ik.solver.rightFootEffector, solver.legs[1]);
-
 			// Bending the spine
+            // 由脚去影响腰
 			if (spineBend != 0f) {
 				spineSpeed = Mathf.Clamp(spineSpeed, 0f, spineSpeed);
 
@@ -162,12 +167,21 @@ namespace RootMotion.FinalIK {
 
 			if (OnPostGrounder != null) OnPostGrounder();
 		}
+
+        
 		
 		// Set the effector positionOffset for the foot
 		private void SetLegIK(IKEffector effector, Grounding.Leg leg) {
-			effector.positionOffset += (leg.IKPosition - effector.bone.position) * weight;
+            //Debug.Log("effector.bone.position = " + effector.bone.position);
+            //Debug.Log("leg.transform.position = " + leg.transform.position);
+            //leg.transform.position == effector.bone.position. 
+            //其实 leg.IKPosition 就是 计算后的 脚的坐标.但是效应器应该是要将其叠加到脚步效应器中做总计算的.毕竟还有别的影响脚的IK
 
-			effector.bone.rotation = Quaternion.Slerp(Quaternion.identity, leg.rotationOffset, weight) * effector.bone.rotation;
+            //直接将计算好的脚的坐标赋值给 效应器中骨头也是可以的
+            //effector.bone.position = leg.IKPosition * weight;
+
+            effector.positionOffset += (leg.IKPosition - effector.bone.position) * weight;
+            effector.bone.rotation = Quaternion.Slerp(Quaternion.identity, leg.rotationOffset, weight) * effector.bone.rotation;
 		}
 
 		// Auto-assign ik

@@ -193,6 +193,7 @@ namespace RootMotion.FinalIK {
 			foreach (IKMappingLimb limbMapping in limbMappings) limbMapping.Initiate(this);
 		}
 
+        // 
 		protected override void OnUpdate() {
 			if (IKPositionWeight <= 0) {
 				// clear effector positionOffsets so they would not accumulate
@@ -205,34 +206,44 @@ namespace RootMotion.FinalIK {
 
 			IKPositionWeight = Mathf.Clamp(IKPositionWeight, 0f, 1f);
 
-			if (OnPreRead != null) OnPreRead();
-
+            if (OnPreRead != null)
+            {
+                OnPreRead();
+            }
+            
 			// Phase 1: Read the pose of the biped
+            // 第一步, 读取当前人的 Pose
 			ReadPose();
-
+            
 			if (OnPreSolve != null) OnPreSolve();
-
+            
 			// Phase 2: Solve IK
+            // 第二步, Solve IK 计算
 			Solve();
-
+            
+            //调用需要预先调用的
 			if (OnPostSolve != null) OnPostSolve();
-
+            
 			// Phase 3: Map biped to it's solved state
+            // 第三步： 将 计算好的各个骨骼的状态映射过去
 			WritePose();
-
+            
 			// Reset effector position offsets to Vector3.zero
 			for (int i = 0; i < effectors.Length; i++) effectors[i].OnPostWrite();
-		}
-		
-		protected virtual void ReadPose() {
+            /**/
+        }
+
+        protected virtual void ReadPose() {
 			// Making sure the limbs are not inverted
 			for (int i = 0; i < chain.Length; i++) {
 				if (chain[i].bendConstraint.initiated) chain[i].bendConstraint.LimitBend(IKPositionWeight, GetEffector(chain[i].nodes[2].transform).positionWeight);
 			}
 
 			// Presolve effectors, apply effector offset to the nodes
+            // 清零之间计算好的 Node 的 offset
 			for (int i = 0; i < effectors.Length; i++) effectors[i].ResetOffset(this);
-			for (int i = 0; i < effectors.Length; i++) effectors[i].OnPreSolve(this);
+            // 计算本次 Node的 offset
+            for (int i = 0; i < effectors.Length; i++) effectors[i].OnPreSolve(this);
 
 			// Set solver positions to match the current bone positions of the biped
 			for (int i = 0; i < chain.Length; i++) {

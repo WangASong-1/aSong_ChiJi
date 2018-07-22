@@ -55,14 +55,17 @@ namespace RootMotion.FinalIK {
         /// IK 处理类的更新函数。仅仅在 IKSolver 不作为 IK脚本的 成员的时候使用; 或者 IK脚本 被禁用 并且 你打算手动的控制 更新
         /// </summary>
         public void Update() {
+            //预先的, 有脚的
 			if (OnPreUpdate != null) OnPreUpdate();
 
 			if (firstInitiation) Initiate(root); // when the IK component has been disabled in Awake, this will initiate it.
 			if (!initiated) return;
 
+            // 读取当前全身的,然后计算,然后再设置进去
 			OnUpdate();
-
+             /*
 			if (OnPostUpdate != null) OnPostUpdate();
+            */
 		}
 
         /// <summary>

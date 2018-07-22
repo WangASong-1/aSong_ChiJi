@@ -47,6 +47,7 @@ namespace RootMotion.FinalIK {
 		/// <summary>
 		/// The position offset in world space. positionOffset will be reset to Vector3.zero each frame after the solver is complete.
 		/// </summary>
+        /// 偏移值,在脚IK上计算好后,最后送给 IKSolver中的 Node
 		public Vector3 positionOffset;
 		/// <summary>
 		/// Is this the last effector of a node chain?
@@ -75,7 +76,9 @@ namespace RootMotion.FinalIK {
 
 		#endregion Main Interface
 
+        //只有脊椎 才有两个子节点：左右大腿
 		public Transform[] childBones = new Transform[0]; // The optional list of other bones that positionOffset and position of this effector will be applied to.
+        // 三根骨骼定义父平面,只有 左右 hand 和 左右 foot才有 父平面.手的是 左右手upperArm，和脊椎； 脚的是左右大腿和脊椎(中间那个spine.不是盆骨也不是胸口那个)
 		public Transform planeBone1; // The first bone defining the parent plane.
 		public Transform planeBone2; // The second bone defining the parent plane.
 		public Transform planeBone3; // The third bone defining the parent plane.
@@ -83,6 +86,7 @@ namespace RootMotion.FinalIK {
 
 		private float posW, rotW;
 		private Vector3[] localPositions = new Vector3[0];
+        //只有左右手和左右脚才会用到使用 平面节点
 		private bool usePlaneNodes;
 		private Quaternion animatedPlaneRotation = Quaternion.identity;
 		private Vector3 animatedPosition;
@@ -173,19 +177,25 @@ namespace RootMotion.FinalIK {
 
 			localPositions = new Vector3[childBones.Length];
 
+
 			// Plane nodes
 			usePlaneNodes = false;
-
-			if (planeBone1 != null) {
+            Debug.Log("bone = " + bone.name);
+            //Debug.Log("target = " + target.name);
+            for (int i = 0; i < childBones.Length; i++)
+            {
+                Debug.Log("childBones = " + childBones[i].name);
+            }
+            if (planeBone1 != null) {
 				solver.GetChainAndNodeIndexes(planeBone1, out plane1ChainIndex, out plane1NodeIndex);
-
+                Debug.Log("planeBone1 = " + planeBone1.name);
 				if (planeBone2 != null) {
 					solver.GetChainAndNodeIndexes(planeBone2, out plane2ChainIndex, out plane2NodeIndex);
-
-					if (planeBone3 != null) {
+                    Debug.Log("planeBone2 = " + planeBone2.name);
+                    if (planeBone3 != null) {
 						solver.GetChainAndNodeIndexes(planeBone3, out plane3ChainIndex, out plane3NodeIndex);
-
-						usePlaneNodes = true;
+                        Debug.Log("planeBone3 = " + planeBone3.name);
+                        usePlaneNodes = true;
 					}
 				}
 
@@ -291,10 +301,11 @@ namespace RootMotion.FinalIK {
 			return Quaternion.LookRotation(viewingVector, upVector);
 		}
 
-		/*
+        /*
 		 * Manipulating node solverPosition
+         * 控制节点 solverPosition 值的计算
 		 * */
-		public void Update(IKSolverFullBody solver) {
+        public void Update(IKSolverFullBody solver) {
 			if (firstUpdate) {
 				animatedPosition = bone.position + solver.GetNode(chainIndex, nodeIndex).offset;
 				firstUpdate = false;

@@ -30,6 +30,7 @@ namespace RootMotion.FinalIK {
 		/// Max step height. Maximum vertical distance of Grounding from the root of the character.
 		/// </summary>
 		[Tooltip("Max step height. Maximum vertical distance of Grounding from the root of the character.")]
+        //最大垂直距离:从人的root位置到地面。应该是用来计算在这个范围内就判断是在地面上
 		public float maxStep = 0.5f;
 		/// <summary>
 		/// The height offset of the root.
@@ -143,6 +144,7 @@ namespace RootMotion.FinalIK {
 		/// <summary>
 		/// Raycasts or sphereCasts to find the root ground point. Distance of the Ray/Sphere cast is maxDistanceMlp x maxStep. Use this instead of rootHit if the Grounder is weighed out/disabled and not updated.
 		/// </summary>
+        /// 根据 脚的位置放射线
 		public RaycastHit GetRootHit(float maxDistanceMlp = 10f) {
 			RaycastHit h = new RaycastHit();
 			Vector3 _up = up;
@@ -235,8 +237,9 @@ namespace RootMotion.FinalIK {
 			prediction = Mathf.Clamp(prediction, 0f, prediction);
 			footSpeed = Mathf.Clamp(footSpeed, 0f, footSpeed);
 
-			// Root hit
+			// Root hit。 从两腿之间发射射线,返回的碰撞 hitInfo.
 			rootHit = GetRootHit();
+
 
 			float lowestOffset = Mathf.NegativeInfinity;
 			float highestOffset = Mathf.Infinity;
@@ -244,8 +247,10 @@ namespace RootMotion.FinalIK {
 
 			// Process legs
 			foreach (Leg leg in legs) {
+                //脚站在地上的 解决器
 				leg.Process();
 
+                //脚偏移边界判断
 				if (leg.IKOffset > lowestOffset) lowestOffset = leg.IKOffset;
 				if (leg.IKOffset < highestOffset) highestOffset = leg.IKOffset;
 

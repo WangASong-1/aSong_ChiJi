@@ -83,6 +83,7 @@ namespace RootMotion.FinalIK {
 			}
 
 			// Raycasting, processing the leg's position
+            // 脚位置的计算器. 主要是看 IKPosition 和 IKRotation怎么计算的
 			public void Process() {
 				if (!initiated) return;
 				if (grounding.maxStep <= 0) return;
@@ -96,6 +97,7 @@ namespace RootMotion.FinalIK {
 				
 				// Calculating velocity
 				velocity = (transform.position - lastPosition) / deltaTime;
+                //速度投影到适合地面的方向(平行？)
 				velocity = grounding.Flatten(velocity);
 				lastPosition = transform.position;
 
@@ -137,30 +139,38 @@ namespace RootMotion.FinalIK {
 					break;
 				}
 
-				// Is the foot grounded?
-				isGrounded = heightFromGround < grounding.maxStep;
 
-				float offsetTarget = stepHeightFromGround;
+                // Is the foot grounded?
+                isGrounded = heightFromGround < grounding.maxStep;
+
+                //获取脚离地的高度. stepHeightFromGround 值是通过:脚上的射线获得 脚transform.position,再 脚transform.position - root.tranform.position
+                float offsetTarget = stepHeightFromGround;
+                //若不在地面上,这个高度置0
 				if (!grounding.rootGrounded) offsetTarget = 0f;
-
+                
+                //脚步IK偏移计算： 线性插值的方式. 将偏移值逐渐修改至离地的高度
 				IKOffset = Interp.LerpValue(IKOffset, offsetTarget, grounding.footSpeed, grounding.footSpeed);
-				IKOffset = Mathf.Lerp(IKOffset, offsetTarget, deltaTime * grounding.footSpeed);
+                //脚步IK偏移计算： 跟上面的差不多.不知道为啥要用两个
+                IKOffset = Mathf.Lerp(IKOffset, offsetTarget, deltaTime * grounding.footSpeed);
 
+                //获取脚离地的实际高度
 				float legHeight = grounding.GetVerticalOffset(transform.position, grounding.root.position);
+                // 当前脚的高度距离最大离地距离还差多少高度
 				float currentMaxOffset = Mathf.Clamp(grounding.maxStep - legHeight, 0f, grounding.maxStep);
 
+                // 限制(在阶梯处会一直脚高一直脚低)
 				IKOffset = Mathf.Clamp(IKOffset, -currentMaxOffset, IKOffset);
 
 				RotateFoot();
-
-				// Update IK values
-				IKPosition = transform.position - up * IKOffset;
+                // Update IK values
+                IKPosition = transform.position - up * IKOffset;
 
 				float rW = grounding.footRotationWeight;
 				rotationOffset = rW >= 1? r: Quaternion.Slerp(Quaternion.identity, r, rW);
 			}
 
 			// Gets the height from ground clamped between min and max step height
+            // 将脚离地最大范围限制在 规定的离地最大范围内(+-0.5f)
 			public float stepHeightFromGround {
 				get {
 					return Mathf.Clamp(heightFromGround, -grounding.maxStep, grounding.maxStep);

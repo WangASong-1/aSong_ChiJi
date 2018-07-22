@@ -110,6 +110,7 @@ namespace RootMotion {
 			if (!updateFrame) return;
 			updateFrame = false;
 
+            //aSong: IKSolver的 Update 被调用的地方
 			UpdateSolver();
 		}
 
