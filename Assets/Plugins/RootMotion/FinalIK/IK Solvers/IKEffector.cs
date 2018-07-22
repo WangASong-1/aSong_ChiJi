@@ -5,6 +5,7 @@ namespace RootMotion.FinalIK {
 
 	/// <summary>
 	///  Effector for manipulating node based %IK solvers.
+    ///  每根骨骼一个效应器.
 	/// </summary>
 	[System.Serializable]
 	public class IKEffector {
@@ -78,7 +79,7 @@ namespace RootMotion.FinalIK {
 
         //只有脊椎 才有两个子节点：左右大腿
 		public Transform[] childBones = new Transform[0]; // The optional list of other bones that positionOffset and position of this effector will be applied to.
-        // 三根骨骼定义父平面,只有 左右 hand 和 左右 foot才有 父平面.手的是 左右手upperArm，和脊椎； 脚的是左右大腿和脊椎(中间那个spine.不是盆骨也不是胸口那个)
+        // 三根骨骼定义限制平面,只有 左右 hand 和 左右 foot才有 父平面.手的是 左右手upperArm，和脊椎； 脚的是左右大腿和脊椎(中间那个spine.不是盆骨也不是胸口那个)
 		public Transform planeBone1; // The first bone defining the parent plane.
 		public Transform planeBone2; // The second bone defining the parent plane.
 		public Transform planeBone3; // The third bone defining the parent plane.
@@ -86,7 +87,7 @@ namespace RootMotion.FinalIK {
 
 		private float posW, rotW;
 		private Vector3[] localPositions = new Vector3[0];
-        //只有左右手和左右脚才会用到使用 平面节点
+        //只有左右手和左右脚才会用到使用 平面限制节点
 		private bool usePlaneNodes;
 		private Quaternion animatedPlaneRotation = Quaternion.identity;
 		private Vector3 animatedPosition;

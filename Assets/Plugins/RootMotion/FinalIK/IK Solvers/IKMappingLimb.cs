@@ -3,10 +3,12 @@ using System.Collections;
 
 namespace RootMotion.FinalIK {
 
-	/// <summary>
-	/// Maps a 3-segmented bone hierarchy to a node chain of an %IK Solver
-	/// </summary>
-	[System.Serializable]
+    /// <summary>
+    /// Maps a 3-segmented bone hierarchy to a node chain of an %IK Solver
+    /// 针对 node chain使用的. 四肢的 chain 有三个 node.所以这里映射也用这个
+    /// parentBone: 手的话就是锁骨 Clavicle, 脚不知道
+    /// </summary>
+    [System.Serializable]
 	public class IKMappingLimb: IKMapping {
 		
 		#region Main Interface

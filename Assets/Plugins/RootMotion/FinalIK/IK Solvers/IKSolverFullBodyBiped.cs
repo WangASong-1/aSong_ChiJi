@@ -62,6 +62,7 @@ namespace RootMotion.FinalIK {
 		/// <summary>
 		/// Gets the body effector.
 		/// </summary>
+        /// 身体效应器.效应器主要用来 控制 基于当前IK的骨骼 旋转和位移，以及三点限制(手受限制于:左右肩膀(UpperArm)和脊椎)
 		public IKEffector bodyEffector { get { return GetEffector(FullBodyBipedEffector.Body); }}
 		/// <summary>
 		/// Gets the left shoulder effector.
@@ -131,6 +132,7 @@ namespace RootMotion.FinalIK {
 		public IKMappingLimb rightLegMapping { get { return limbMappings[3]; }}
 		/// <summary>
 		/// Gets the head IK mapping.
+        /// 单骨骼 映射器
 		/// </summary>
 		public IKMappingBone headMapping { get { return boneMappings[0]; }}
 

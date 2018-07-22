@@ -3,10 +3,11 @@ using System.Collections;
 
 namespace RootMotion.FinalIK {
 
-	/// <summary>
-	/// Maps a bone or a collection of bones to a node based %IK solver
-	/// </summary>
-	[System.Serializable]
+    /// <summary>
+    /// Maps a bone or a collection of bones to a node based %IK solver
+    /// 从这里将 IK计算的 position 和rotation写入到 骨骼中
+    /// </summary>
+    [System.Serializable]
 	public class IKMapping {
 		
 		#region Main Interface

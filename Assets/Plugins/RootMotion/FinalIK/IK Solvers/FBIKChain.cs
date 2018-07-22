@@ -6,6 +6,7 @@ namespace RootMotion.FinalIK {
 
 	/// <summary>
 	/// A chain of bones in IKSolverFullBody.
+    /// 一连串的骨头. 一共5条链:1:脊椎; 2345:四肢(各含三个骨头).为了计算push pull动作
 	/// </summary>
 	[System.Serializable]
 	public class FBIKChain {
@@ -253,6 +254,13 @@ namespace RootMotion.FinalIK {
 			crossFades = new float[children.Length];
 
 			initiated = true;
+
+            Debug.Log("Chain's names ");
+            for(int i = 0; i < nodes.Length; i++)
+            {
+                Debug.Log("Chain's node = " + nodes[i].transform.name);
+            }
+            
 		}
 
 		/*

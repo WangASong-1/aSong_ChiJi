@@ -5,6 +5,7 @@ namespace RootMotion.FinalIK {
 
 	/// <summary>
 	/// Maps a single bone to a node in %IK Solver
+    /// 单骨骼映射器.从这里将 IK计算的 position 和rotation写入到 骨骼中
 	/// </summary>
 	[System.Serializable]
 	public class IKMappingBone: IKMapping {

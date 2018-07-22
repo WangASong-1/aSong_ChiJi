@@ -19,6 +19,7 @@ namespace RootMotion.Demos {
 		private FullBodyBipedIK ik;
 
 		private Vector3 headLookAxis;
+        //左手相对于右手的局部坐标
 		private Vector3 leftHandPosRelToRightHand;
 		private Quaternion leftHandRotRelToRightHand;
 		private Vector3 aimTarget;
@@ -102,8 +103,13 @@ namespace RootMotion.Demos {
 		// Final calculations before FBBIK solves. Recoil has already solved by, so we can use it's calculated offsets. 
 		// Here we set the left hand position relative to the position and rotation of the right hand.
 		private void OnPreRead() {
-			Quaternion r = recoil != null? recoil.rotationOffset * rightHandRotation: rightHandRotation;
-			Vector3 leftHandTarget = ik.references.rightHand.position + ik.solver.rightHandEffector.positionOffset + r * leftHandPosRelToRightHand;
+            // Quaternion * Quaternion 的几何意义：用来实现transform绕着自身坐标系中的某个轴进行旋转(z,x,y旋转计算顺序)
+            //这个是计算抬枪后坐力的旋转(当前是 7° Y轴旋转)
+            Quaternion r = recoil != null? recoil.rotationOffset * rightHandRotation: rightHandRotation;
+            // Quaternion * Vector3 的几何意义： 用来实现transform沿着自身坐标系的某个方向进行移动
+            // 左手的目标位置计算: 右手的IK预计算.然后再加上 后坐力的移动方向上移动左手相对于右手的位移.以便保持左手跟随右手IK
+            Vector3 leftHandTarget = ik.references.rightHand.position + ik.solver.rightHandEffector.positionOffset + r * leftHandPosRelToRightHand;
+            
 			ik.solver.leftHandEffector.positionOffset += leftHandTarget - ik.references.leftHand.position - ik.solver.leftHandEffector.positionOffset + r * leftHandOffset;
 		}
 
