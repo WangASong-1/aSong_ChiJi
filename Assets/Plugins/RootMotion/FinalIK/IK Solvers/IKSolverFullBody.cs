@@ -208,33 +208,38 @@ namespace RootMotion.FinalIK {
 
             if (OnPreRead != null)
             {
+                //两足动物没有
+                Debug.Log("!!!!!!!!!!@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
                 OnPreRead();
             }
             
 			// Phase 1: Read the pose of the biped
             // 第一步, 读取当前人的 Pose
 			ReadPose();
-            
-			if (OnPreSolve != null) OnPreSolve();
+
+            //调用需要预先调用的.许挂载的 代理函数
+            if (OnPreSolve != null) OnPreSolve();
             
 			// Phase 2: Solve IK
-            // 第二步, Solve IK 计算
+            // 第二步, Solve IK 计算 即 效应器Effector 的update.以及chain的 push 和pull
 			Solve();
             
-            //调用需要预先调用的
+            //调用需要预先调用的.许挂载的 代理函数
 			if (OnPostSolve != null) OnPostSolve();
             
 			// Phase 3: Map biped to it's solved state
-            // 第三步： 将 计算好的各个骨骼的状态映射过去
+            // 第三步： 将 计算好的各个骨骼的状态映射过去. node.solverPosition 的写入
 			WritePose();
             
 			// Reset effector position offsets to Vector3.zero
+            // 重置效应器里面的 offset
 			for (int i = 0; i < effectors.Length; i++) effectors[i].OnPostWrite();
             /**/
         }
 
         protected virtual void ReadPose() {
 			// Making sure the limbs are not inverted
+            // 确保肢体没有被翻转, 约束其在一定范围内
 			for (int i = 0; i < chain.Length; i++) {
 				if (chain[i].bendConstraint.initiated) chain[i].bendConstraint.LimitBend(IKPositionWeight, GetEffector(chain[i].nodes[2].transform).positionWeight);
 			}
@@ -242,11 +247,12 @@ namespace RootMotion.FinalIK {
 			// Presolve effectors, apply effector offset to the nodes
             // 清零之间计算好的 Node 的 offset
 			for (int i = 0; i < effectors.Length; i++) effectors[i].ResetOffset(this);
-            // 计算本次 Node的 offset
+            // 将上一帧所产生的 effctor 的偏移值送给 node的offset
             for (int i = 0; i < effectors.Length; i++) effectors[i].OnPreSolve(this);
 
-			// Set solver positions to match the current bone positions of the biped
-			for (int i = 0; i < chain.Length; i++) {
+            // Set solver positions to match the current bone positions of the biped
+            // 将上一次 累计的offset置入到 chain 各个骨骼的solverPosition中去
+            for (int i = 0; i < chain.Length; i++) {
 				chain[i].ReadPose(this, iterations > 0);
 			}
 
@@ -315,11 +321,12 @@ namespace RootMotion.FinalIK {
 			if (IKPositionWeight <= 0f) return;
 
 			// Apply IK mapping
+            // 通过mapping 将旋转位移写入到骨骼中
 			if (iterations > 0) {
 				spineMapping.WritePose(this);
 				for (int i = 0; i < boneMappings.Length; i++) boneMappings[i].WritePose(IKPositionWeight);
 			}
-
+            // 四肢的旋转位移写入
 			for (int i = 0; i < limbMappings.Length; i++) limbMappings[i].WritePose(this, iterations > 0);
 		}
 	}

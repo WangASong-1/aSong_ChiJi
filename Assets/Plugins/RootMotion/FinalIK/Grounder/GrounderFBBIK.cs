@@ -97,7 +97,6 @@ namespace RootMotion.FinalIK {
 			if (weight <= 0f) return;
 
             if (initiated) {
-                //OnSolverUpdate();
                 return;
             }
             if (!IsReadyToInitiate()) return;
@@ -132,9 +131,10 @@ namespace RootMotion.FinalIK {
 			initiated = true;
 		}
 
-		// Called before updating the main IK solver
-        // 这个要在主IK solver调用之前调用,避免覆盖主IK的计算
-		private void OnSolverUpdate() {
+        // Called before updating the main IK solver
+        // 这个要在 主IK solver调用之前调用,避免覆盖主IK的计算
+        // 计算两脚的 的 effector.positionOffset
+        private void OnSolverUpdate() {
 			if (!firstSolve) return;
 			firstSolve = false;
 			if (!enabled) return;
@@ -177,10 +177,11 @@ namespace RootMotion.FinalIK {
             //leg.transform.position == effector.bone.position. 
             //其实 leg.IKPosition 就是 计算后的 脚的坐标.但是效应器应该是要将其叠加到脚步效应器中做总计算的.毕竟还有别的影响脚的IK
 
-            //直接将计算好的脚的坐标赋值给 效应器中骨头也是可以的
+            //直接将计算好的脚的坐标赋值给 效应器中骨头也是可以的. 但是会出现我之前弄走路 IK那个的类似问题
             //effector.bone.position = leg.IKPosition * weight;
 
             effector.positionOffset += (leg.IKPosition - effector.bone.position) * weight;
+            //这里直接旋转脚了
             effector.bone.rotation = Quaternion.Slerp(Quaternion.identity, leg.rotationOffset, weight) * effector.bone.rotation;
 		}
 

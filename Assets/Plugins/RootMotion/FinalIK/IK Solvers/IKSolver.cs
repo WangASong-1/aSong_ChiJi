@@ -63,9 +63,9 @@ namespace RootMotion.FinalIK {
 
             // 读取当前全身的,然后计算,然后再设置进去
 			OnUpdate();
-             /*
+             
 			if (OnPostUpdate != null) OnPostUpdate();
-            */
+            
 		}
 
         /// <summary>
@@ -160,10 +160,11 @@ namespace RootMotion.FinalIK {
 			/// </summary>
 			[Range(0f, 1f)]
 			public float weight = 1f;
-			/// <summary>
-			/// Virtual position in the %IK solver.
-			/// </summary>
-			public Vector3 solverPosition;
+            /// <summary>
+            /// Virtual position in the %IK solver.
+            /// 计算好的 offset最终都被叠加到 Node中的 solverPosition中
+            /// </summary>
+            public Vector3 solverPosition;
 			/// <summary>
 			/// Virtual rotation in the %IK solver.
 			/// </summary>

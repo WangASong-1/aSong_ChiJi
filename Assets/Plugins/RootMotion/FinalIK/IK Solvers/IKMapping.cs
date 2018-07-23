@@ -19,6 +19,7 @@ namespace RootMotion.FinalIK {
 		public class BoneMap {
 			/// <summary>
 			/// The transform.
+            /// 对应该骨骼的 transform 引用
 			/// </summary>
 			public Transform transform;
 			/// <summary>
@@ -37,6 +38,7 @@ namespace RootMotion.FinalIK {
 			public float length;
 			public Quaternion animatedRotation;
 
+            // 
 			private Transform planeBone1, planeBone2, planeBone3;
 			private int plane1ChainIndex = -1;
 			private int plane1NodeIndex = -1;
@@ -123,7 +125,11 @@ namespace RootMotion.FinalIK {
 				this.planeBone2 = planeBone2;
 				this.planeBone3 = planeBone3;
 
-				solver.GetChainAndNodeIndexes(planeBone1, out plane1ChainIndex, out plane1NodeIndex);
+                Debug.Log("planeBone1!!!!!!!!!!!!!!!!!! = " + planeBone1.name);
+                Debug.Log("planeBone2!!!!!!!!!!!!!!!!! = " + planeBone2.name);
+                Debug.Log("planeBone3 !!!!!!!!!!!!!!!= " + planeBone3.name);
+
+                solver.GetChainAndNodeIndexes(planeBone1, out plane1ChainIndex, out plane1NodeIndex);
 				solver.GetChainAndNodeIndexes(planeBone2, out plane2ChainIndex, out plane2NodeIndex);
 				solver.GetChainAndNodeIndexes(planeBone3, out plane3ChainIndex, out plane3NodeIndex);
 
@@ -203,6 +209,7 @@ namespace RootMotion.FinalIK {
 			 * Rotates the bone relative to it's 3 plane nodes
 			 * */
 			public void RotateToPlane(IKSolverFullBody solver, float weight) {
+                // 根据三个限制骨骼来确定最终的旋转值
 				Quaternion r = GetTargetRotation(solver) * defaultLocalTargetRotation;
 
 				if (weight >= 1f) {

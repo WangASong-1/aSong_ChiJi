@@ -132,6 +132,7 @@ using System.Collections;
 
 		/*
 		 * Limits the bending joint of the limb to 90 degrees from the default 90 degrees of bend direction
+         * 将肢体关节从 默认90度的弯曲方向 限制到 90度
 		 * */
 		public void LimitBend(float solverWeight, float positionWeight) {
 			if (!initiated) return;

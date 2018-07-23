@@ -498,12 +498,15 @@ namespace RootMotion.FinalIK {
 
 		protected override void ReadPose() {
 			// Set effectors to their targets
+            // 一般没有targets
 			for (int i = 0; i < effectors.Length; i++) effectors[i].SetToTarget();
 
 			// Pulling the body with the hands
+            // 通过手拉动身体
 			PullBody();
 			
 			// Spine stiffness
+            // 脊椎的僵硬程度(推拉参数)
 			float s = Mathf.Clamp(1f - spineStiffness, 0f, 1f);
 			chain[0].childConstraints[0].pushElasticity = s;
 			chain[0].childConstraints[1].pushElasticity = s;

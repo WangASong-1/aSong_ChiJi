@@ -5,7 +5,7 @@ namespace RootMotion.FinalIK {
 
 	/// <summary>
 	///  Effector for manipulating node based %IK solvers.
-    ///  每根骨骼一个效应器.
+    ///  每根骨骼一个效应器. 通过效应器操作骨骼.只读取bone的位移旋转，从不写入
 	/// </summary>
 	[System.Serializable]
 	public class IKEffector {
@@ -25,6 +25,7 @@ namespace RootMotion.FinalIK {
 		public Transform bone;
 		/// <summary>
 		/// The target Transform (optional, you can use just the position and rotation instead).
+        /// 在 Inspector中直接赋予
 		/// </summary>
 		public Transform target;
 		/// <summary>
@@ -48,7 +49,7 @@ namespace RootMotion.FinalIK {
 		/// <summary>
 		/// The position offset in world space. positionOffset will be reset to Vector3.zero each frame after the solver is complete.
 		/// </summary>
-        /// 偏移值,在脚IK上计算好后,最后送给 IKSolver中的 Node
+        /// 偏移值,在脚IK上计算好后,最后送给 IKSolver中的 Node的 offset
 		public Vector3 positionOffset;
 		/// <summary>
 		/// Is this the last effector of a node chain?

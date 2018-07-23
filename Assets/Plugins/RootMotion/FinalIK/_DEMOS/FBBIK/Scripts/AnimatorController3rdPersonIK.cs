@@ -91,6 +91,7 @@ namespace RootMotion.Demos {
 			ik.solver.Update();
 			
 			// Rotating the hand bones after IK has finished
+            // IK计算完之后再写入 recoil 的 IK计算
 			if (recoil != null) {
 				ik.references.rightHand.rotation = recoil.rotationOffset * rightHandRotation;
 				ik.references.leftHand.rotation = recoil.rotationOffset * rightHandRotation * leftHandRotRelToRightHand;
@@ -109,7 +110,7 @@ namespace RootMotion.Demos {
             // Quaternion * Vector3 的几何意义： 用来实现transform沿着自身坐标系的某个方向进行移动
             // 左手的目标位置计算: 右手的IK预计算.然后再加上 后坐力的移动方向上移动左手相对于右手的位移.以便保持左手跟随右手IK
             Vector3 leftHandTarget = ik.references.rightHand.position + ik.solver.rightHandEffector.positionOffset + r * leftHandPosRelToRightHand;
-            
+            // 左手预先计算好需要跟随的位置
 			ik.solver.leftHandEffector.positionOffset += leftHandTarget - ik.references.leftHand.position - ik.solver.leftHandEffector.positionOffset + r * leftHandOffset;
 		}
 

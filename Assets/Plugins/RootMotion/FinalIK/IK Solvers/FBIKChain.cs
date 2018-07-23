@@ -277,6 +277,7 @@ namespace RootMotion.FinalIK {
 			CalculateBoneLengths(solver);
 
 			if (fullBody) {
+                // 推拉的计算
 				// Pre-update child constraints
 				for (int i = 0; i < childConstraints.Length; i++) childConstraints[i].OnPreSolve(solver);
 
@@ -306,12 +307,13 @@ namespace RootMotion.FinalIK {
 			}
 		}
 
-		// Calculates all bone lengths as well as lenghts between the chains
+		// Calculates all bone lengths as well as lengths between the chains
 		private void CalculateBoneLengths(IKSolverFullBody solver) {
 			// Calculating bone lengths
 			length = 0f;
 			
 			for (int i = 0; i < nodes.Length - 1; i++) {
+                //计算链中 两个骨骼之间的长度
 				nodes[i].length = Vector3.Distance(nodes[i].transform.position, nodes[i + 1].transform.position);
 				length += nodes[i].length;
 				

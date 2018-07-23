@@ -165,6 +165,7 @@ namespace RootMotion.FinalIK {
 				}
 				
 				// Fix the first bone to it's node
+                // 位移写入
 				boneMap1.FixToNode(solver, weight);
 			}
 
