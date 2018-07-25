@@ -13,7 +13,7 @@ public class EnemyAI : MonoBehaviour {
     public float anglarSpeedDampTime = 0.3f;
 
     private Animator mAnim;
-    private NavMeshAgent mNav;
+    private UnityEngine.AI.NavMeshAgent mNav;
     private Transform player;
 
     private float speed = 0f;
@@ -28,7 +28,7 @@ public class EnemyAI : MonoBehaviour {
     private void Awake()
     {
         mAnim = GetComponent<Animator>();
-        mNav = GetComponent<NavMeshAgent>();
+        mNav = GetComponent<UnityEngine.AI.NavMeshAgent>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
     }
 

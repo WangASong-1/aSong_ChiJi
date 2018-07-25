@@ -60,8 +60,8 @@ public class IK_Foot : MonoBehaviour {
 
     private void OnAnimatorIK(int layerIndex)
     {
-        mAnim.SetLookAtWeight(1);
-        mAnim.SetLookAtPosition(target.position);
+        //mAnim.SetLookAtWeight(1);
+        //mAnim.SetLookAtPosition(target.position);
 
         
         leftFootWeight = mAnim.GetFloat("leftFootWeight");
