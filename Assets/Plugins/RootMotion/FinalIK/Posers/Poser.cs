@@ -5,6 +5,7 @@ namespace RootMotion.FinalIK {
 
 	/// <summary>
 	/// The base abstract class for all class that are translating a hierarchy of bones to match the translation of bones in another hierarchy.
+    /// 只解决手势问题，即手旋转和手指抓取的样子，不解决手位移跟随
 	/// </summary>
 	public abstract class Poser: SolverManager {
 

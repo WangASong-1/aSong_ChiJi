@@ -298,10 +298,11 @@ namespace RootMotion.FinalIK {
 			return min;
 		}
 
-		/// <summary>
-		/// Triggers all interactions of an InteractionTrigger. Returns false if unsuccessful (maybe out of range).
-		/// </summary>
-		public bool TriggerInteraction(int index, bool interrupt) {
+        /// <summary>
+        /// Triggers all interactions of an InteractionTrigger. Returns false if unsuccessful (maybe out of range).
+        /// 触发所有的 挂在 InteractionTrigger 上的Range范围内的 interactions 操作.不成功返回 false
+        /// </summary>
+        public bool TriggerInteraction(int index, bool interrupt) {
 			if (!IsValid(true)) return false;
 
 			if (!TriggerIndexIsValid(index)) return false;
@@ -311,7 +312,7 @@ namespace RootMotion.FinalIK {
 			var range = triggersInRange[index].ranges[bestRangeIndexes[index]];
 
 			for (int i = 0; i < range.interactions.Length; i++) {
-				for (int e = 0; e < range.interactions[i].effectors.Length; e++) {
+                for (int e = 0; e < range.interactions[i].effectors.Length; e++) {
 					bool s = StartInteraction(range.interactions[i].effectors[e], range.interactions[i].interactionObject, interrupt);
 					if (!s) all = false;
 				}
