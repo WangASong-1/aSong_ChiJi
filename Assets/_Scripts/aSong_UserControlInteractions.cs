@@ -4,6 +4,8 @@ using UnityEngine;
 using RootMotion.Demos;
 using RootMotion.FinalIK;
 
+//武器挂在骨骼下面在拿取的时候因为会随着骨骼动，导致武器位移，导致最后抓取拿到手上的位置不是我们预定好的位置。要么不挂在骨骼下面，要么抓取的时候parent = null
+//需要动画做基础,FinalIK只是在动画上修整.比如双手持枪,就无法做到待机之类的.顶多固定到那一个点上.
 public class aSong_UserControlInteractions : UserControlThirdPerson
 {
     [SerializeField] CharacterThirdPerson character;
@@ -87,6 +89,8 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
 
         
     }
+
+
     public InteractionObject obj;
     // Triggering the interactions
     void OnGUI()
@@ -109,6 +113,13 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
 
         // If not paused, find the closest InteractionTrigger that the character is in contact with
         int closestTriggerIndex = interactionSystem.GetClosestTriggerIndex();
+
+        InteractionObject[] objs = interactionSystem.GetClosestInteractionObjectsInRange();
+        //objs 有一个 model,保存他的 图片,然后将图片获取 放到 control 上 显示到 view(滑条)中,并添加点击事件，点击后拾取,出范围后 remove view中按钮
+        for(int i = 0; i < objs.Length; i++)
+        {
+            
+        }
 
         // ...if none found, do nothing
         if (closestTriggerIndex == -1) return;
