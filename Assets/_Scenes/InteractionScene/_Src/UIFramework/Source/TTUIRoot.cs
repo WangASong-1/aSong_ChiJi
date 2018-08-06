@@ -67,7 +67,7 @@ namespace TinyTeam.UI {
          m_Instance.uiCamera = cam;
 
          //add audio listener
-         camObj.AddComponent<AudioListener>();
+         //camObj.AddComponent<AudioListener>();
          camObj.AddComponent<GUILayer>();
 
          CanvasScaler cs = go.AddComponent<CanvasScaler>();
