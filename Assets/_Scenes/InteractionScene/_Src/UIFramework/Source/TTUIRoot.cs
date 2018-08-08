@@ -102,7 +102,8 @@ namespace TinyTeam.UI {
          //add Event System
          GameObject esObj = GameObject.Find("EventSystem");
          if (esObj != null) {
-            GameObject.DestroyImmediate(esObj);
+            //GameObject.DestroyImmediate(esObj);
+            GameObject.Destroy(esObj);
          }
 
          GameObject eventObj = new GameObject("EventSystem");

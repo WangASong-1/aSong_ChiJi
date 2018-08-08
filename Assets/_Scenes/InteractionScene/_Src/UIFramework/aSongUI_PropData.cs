@@ -23,16 +23,18 @@ public class aSongUI_PropData : MonoBehaviour {
         public PropType type;
         public PropName name;
         public static int idCount = 0;
-        public Prop(PropName name)
+        public Prop(PropName _name)
         {
             idCount++;
+            name = _name;
             propID = idCount;
-            pic = Resources.Load<Sprite>(name.ToString());
-            type = aSongUI_Controller.Instance.GetPropType(name);
+            pic = Resources.Load<Sprite>(_name.ToString());
+            type = aSongUI_Controller.Instance.GetPropType(_name);
         }
 
         private Prop() { }
     }
 
     public List<Prop> props;
+    public Dictionary<int, Prop> dic_prop;
 }

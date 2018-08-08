@@ -1,3 +1,3 @@
-﻿{"M416":{"propName":"M416", "propType":"bomb","instruction":"M416","attack":"10"},
- "pistol":{"propName":"pistol", "propType":"bomb","instruction":"小手枪咯","attack":"1"}
+﻿{"M416":{"propName":"M416", "propType":"bomb","instruction":"M416","attack":"10", "sort":"1"},
+ "pistol":{"propName":"pistol", "propType":"bomb","instruction":"小手枪咯","attack":"1","sort":"2"}
 }

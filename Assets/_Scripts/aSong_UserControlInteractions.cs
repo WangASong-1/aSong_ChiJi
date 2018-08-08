@@ -118,7 +118,7 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
         //objs 有一个 model,保存他的 图片,然后将图片获取 放到 control 上 显示到 view(滑条)中,并添加点击事件，点击后拾取,出范围后 remove view中按钮
         for(int i = 0; i < objs.Length; i++)
         {
-            aSongUI_Controller.Instance.AddProp(objs[i].GetComponentInParent<PropBaseModel>().prop) ;
+            //aSongUI_Controller.Instance.AddProp(objs[i].GetComponentInParent<PropBaseModel>().prop) ;
         }
 
         // ...if none found, do nothing

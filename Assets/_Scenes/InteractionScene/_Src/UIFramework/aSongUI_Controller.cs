@@ -23,6 +23,8 @@ public class aSongUI_Controller {
     public aSongUI_PropData playerProp;
     public JsonData jd;
 
+    private aSong_UIPropList mUIPropList;
+
 
     private aSongUI_Controller()
     {
@@ -30,6 +32,7 @@ public class aSongUI_Controller {
         jd = aSong_UnityJsonUtil.Read(Application.streamingAssetsPath, "AllProps", false);
         playerProp = new aSongUI_PropData();
         playerProp.props = new List<aSongUI_PropData.Prop>();
+        playerProp.dic_prop = new Dictionary<int, aSongUI_PropData.Prop>();
         Debug.Log(PropName.M416.ToString());
         
     }
@@ -38,8 +41,7 @@ public class aSongUI_Controller {
     public void AddProp(PropName mName)
     {
         aSongUI_PropData.Prop prop = new aSongUI_PropData.Prop(mName);
-        playerProp.props.Add(prop);
-        TTUIPage.ShowPage<aSong_UIPropList>();
+        AddProp(prop);
     }
 
     public void AddProp(aSongUI_PropData.Prop _prop)
@@ -47,7 +49,25 @@ public class aSongUI_Controller {
         if (_prop == null || playerProp.props.Contains(_prop))
             return;
         playerProp.props.Add(_prop);
-        TTUIPage.ShowPage<aSong_UIPropList>();
+        RefreshPropList();
+    }
+
+    void RefreshPropList()
+    {
+        if (mUIPropList == null)
+        {
+            TTUIPage.ShowPage<aSong_UIPropList>();
+            if (TTUIPage.allPages.ContainsKey("aSong_UIPropList"))
+            {
+                mUIPropList = (aSong_UIPropList)TTUIPage.allPages["aSong_UIPropList"];
+            }
+
+        }
+        else
+        {
+            mUIPropList.Refresh();
+        }
+
     }
 
 
@@ -56,7 +76,11 @@ public class aSongUI_Controller {
         if (_prop == null || !playerProp.props.Contains(_prop))
             return;
         playerProp.props.Remove(_prop);
-        TTUIPage.ShowPage<aSong_UIPropList>();
+        if(playerProp.props.Count<=0)
+            TTUIPage.ClosePage<aSong_UIPropList>();
+        else
+            RefreshPropList();
+
     }
 
     public PropType GetPropType(PropName _name)

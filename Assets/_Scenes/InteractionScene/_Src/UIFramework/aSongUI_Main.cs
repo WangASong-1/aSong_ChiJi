@@ -6,6 +6,6 @@ using TinyTeam.UI;
 public class aSongUI_Main : MonoBehaviour {
     private void Awake()
     {
-        TTUIPage.ShowPage<aSong_UIPropList>();
+        //TTUIPage.ShowPage<aSong_UIPropList>();
     }
 }
