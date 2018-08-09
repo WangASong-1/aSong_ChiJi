@@ -5,20 +5,27 @@ using RootMotion.FinalIK;
 
 //可以写进 InteractionSystem 的
 public class aSongUI_Contact : MonoBehaviour {
+    [SerializeField]
+    public Dic_PropModel dic_propModel = new Dic_PropModel();
 
     public void OnTriggerEnter(Collider c)
     {
 
-        var trigger = c.GetComponent<InteractionTrigger>();
+        PropBaseModel model = c.GetComponentInParent<PropBaseModel>();
 
-        if (trigger == null) return;
-        aSongUI_Controller.Instance.AddProp(trigger.GetComponentInParent<PropBaseModel>().prop);
+        if (model == null) return;
+        if(!dic_propModel.ContainsKey(model.prop.propID))
+            dic_propModel.Add(model.prop.propID, model);
+        aSongUI_Controller.Instance.AddProp(model);
     }
 
     public void OnTriggerExit(Collider c)
     {
-        var trigger = c.GetComponent<InteractionTrigger>();
-        if (trigger == null) return;
-        aSongUI_Controller.Instance.RemoveProp(trigger.GetComponentInParent<PropBaseModel>().prop);
+        PropBaseModel model = c.GetComponentInParent<PropBaseModel>();
+
+        if (model == null) return;
+        if (dic_propModel.ContainsKey(model.prop.propID))
+            dic_propModel.Remove(model.prop.propID);
+        aSongUI_Controller.Instance.RemoveProp(model);
     }
 }

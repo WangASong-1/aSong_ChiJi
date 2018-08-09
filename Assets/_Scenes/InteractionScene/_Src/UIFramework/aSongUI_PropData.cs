@@ -35,6 +35,5 @@ public class aSongUI_PropData : MonoBehaviour {
         private Prop() { }
     }
 
-    public List<Prop> props;
-    public Dictionary<int, Prop> dic_prop;
+    public Dic_PropModel dic_prop;
 }

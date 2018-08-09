@@ -17,11 +17,18 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
     [SerializeField]
     private Transform[] weaponPoint;
 
+    private aSongUI_Contact mContact;
+
+    [SerializeField]
+    private PropBaseModel currentProp;
+
     private void Start()
     {
+        aSongUI_Controller.Instance.mUserCtrl = this;
         animator = GetComponent<Animator>();
         if (animator == null) animator = GetComponentInChildren<Animator>();
         cam = Camera.main.transform;
+        mContact = GetComponent<aSongUI_Contact>();
     }
 
     protected override void Update()
@@ -140,5 +147,45 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
        
     }
 
-    
+    public bool PickupProp(PropBaseModel model)
+    {
+        if (interactionSystem.IsInInteraction(FullBodyBipedEffector.RightHand))
+            return false;
+        if(currentProp != null)
+        {
+            currentProp.Discard();
+        }
+        InteractionObject _obj = model.mInteractionObject;
+        model.Pickup();
+        interactionSystem.StartInteraction(FullBodyBipedEffector.RightHand, _obj, false);
+        interactionSystem.StartInteraction(FullBodyBipedEffector.LeftHand, _obj, false);
+        if (model.prop.name == PropName.M416)
+        {
+            
+            animator.SetLayerWeight(1, 1);
+        }
+        else
+        {
+            animator.SetLayerWeight(1, 0);
+
+        }
+
+        currentProp = model;
+        return true;
+    }
+
+    //丢掉指定道具,为空就是丢掉手上道具
+    public void Discard(PropBaseModel model = null)
+    {
+        if(currentProp == model || (currentProp!=null && model==null))
+        {
+            currentProp = null;
+            animator.SetLayerWeight(1, 0);
+            interactionSystem.StopInteraction(FullBodyBipedEffector.RightHand);
+            interactionSystem.StopInteraction(FullBodyBipedEffector.LeftHand);
+
+        }
+        model.Discard();
+
+    }
 }

@@ -66,13 +66,22 @@ public class aSong_UIPropList : TTUIPage
         b_showed = true;
         this.gameObject.SetActive(true);
         aSongUI_PropData propData = this.data != null ? this.data as aSongUI_PropData : aSongUI_Controller.Instance.playerProp;
-        Debug.Log("propData.props.Count = " + propData.props.Count);
-        for (int i = 0; i < propData.props.Count; i++)
+        Debug.Log("propData.props.Count = " + propData.dic_prop.Count);
+
+
+        var enumerator = propData.dic_prop.GetEnumerator();
+        while (enumerator.MoveNext())
+        {
+            AddPropToItem(enumerator.Current.Value.prop);
+        }
+        /*
+        for (int i = 0; i < propData.dic_prop.Count; i++)
         {
             //CreatePropItem(propData.props[i]);
-            Debug.Log("propData.props.id = " + propData.props[i].propID);
-            AddPropToItem(propData.props[i]);
+            Debug.Log("propData.props.id = " + propData.dic_prop[i].prop.propID);
+            AddPropToItem(propData.dic_prop[i].prop);
         }
+        */
     }
 
     private void AddPropToItem(aSongUI_PropData.Prop prop)
@@ -105,7 +114,7 @@ public class aSong_UIPropList : TTUIPage
         aSongUI_PropListItem item = go.AddComponent<aSongUI_PropListItem>();
         item.Refresh(prop);
         propItems.Add(item);
-
+        Debug.Log("CreatePropItem");
         //add click btn
         go.AddComponent<Button>().onClick.AddListener(OnClickSkillItem);
     }
@@ -114,6 +123,8 @@ public class aSong_UIPropList : TTUIPage
     private void OnClickSkillItem()
     {
         aSongUI_PropListItem item = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.GetComponent<aSongUI_PropListItem>();
+        Debug.Log("propID = " + item.data.propID);
+        aSongUI_Controller.Instance.PickupProp(item.data.propID);
     }
     
 }

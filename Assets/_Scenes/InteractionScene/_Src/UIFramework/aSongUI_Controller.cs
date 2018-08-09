@@ -25,30 +25,27 @@ public class aSongUI_Controller {
 
     private aSong_UIPropList mUIPropList;
 
+    //这个应该用事件来做.
+    public aSong_UserControlInteractions mUserCtrl;
+
 
     private aSongUI_Controller()
     {
         //NOTE : this is Test Init Here.
         jd = aSong_UnityJsonUtil.Read(Application.streamingAssetsPath, "AllProps", false);
         playerProp = new aSongUI_PropData();
-        playerProp.props = new List<aSongUI_PropData.Prop>();
-        playerProp.dic_prop = new Dictionary<int, aSongUI_PropData.Prop>();
+        playerProp.dic_prop = new Dic_PropModel();
         Debug.Log(PropName.M416.ToString());
         
     }
 
     //在武器范围内，添加需要拾取的武器到List中并刷新
-    public void AddProp(PropName mName)
-    {
-        aSongUI_PropData.Prop prop = new aSongUI_PropData.Prop(mName);
-        AddProp(prop);
-    }
 
-    public void AddProp(aSongUI_PropData.Prop _prop)
+    public void AddProp(PropBaseModel _model)
     {
-        if (_prop == null || playerProp.props.Contains(_prop))
+        if (_model == null || playerProp.dic_prop.ContainsKey(_model.prop.propID))
             return;
-        playerProp.props.Add(_prop);
+        playerProp.dic_prop.Add(_model.prop.propID,_model);
         RefreshPropList();
     }
 
@@ -67,16 +64,14 @@ public class aSongUI_Controller {
         {
             mUIPropList.Refresh();
         }
-
     }
 
-
-    public void RemoveProp(aSongUI_PropData.Prop _prop)
+    public void RemoveProp(PropBaseModel _model)
     {
-        if (_prop == null || !playerProp.props.Contains(_prop))
+        if (_model == null || !playerProp.dic_prop.ContainsKey(_model.prop.propID))
             return;
-        playerProp.props.Remove(_prop);
-        if(playerProp.props.Count<=0)
+        playerProp.dic_prop.Remove(_model.prop.propID);
+        if(playerProp.dic_prop.Count<=0)
             TTUIPage.ClosePage<aSong_UIPropList>();
         else
             RefreshPropList();
@@ -86,5 +81,12 @@ public class aSongUI_Controller {
     public PropType GetPropType(PropName _name)
     {
         return (PropType)Enum.Parse(typeof(PropType), jd[_name.ToString()]["propType"].ToString());
+    }
+
+    public void PickupProp(int _propID)
+    {
+        PropBaseModel model = playerProp.dic_prop[_propID];
+        if(mUserCtrl.PickupProp(model))
+            RemoveProp(model);
     }
 }
