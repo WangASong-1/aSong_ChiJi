@@ -147,14 +147,45 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
        
     }
 
+    void PutInBag()
+    {
+        if (aSongUI_Controller.Instance.playerData.GetGunNum() >= 2)
+        {
+            if (currentProp != null)
+            {
+                currentProp.Discard();
+            }
+        }
+
+    }
+
     public bool PickupProp(PropBaseModel model)
     {
         if (interactionSystem.IsInInteraction(FullBodyBipedEffector.RightHand))
             return false;
-        if(currentProp != null)
+
+        bool b_Discard = false;
+        switch (model.prop.type)
+        {
+            case PropType.pistol:
+                if (aSongUI_Controller.Instance.playerData.Pistol != null)
+                    b_Discard = true;
+                break;
+            case PropType.rifle:
+                if (aSongUI_Controller.Instance.playerData.Guns.Count >= 2)
+                    b_Discard = true;
+                break;
+            case PropType.bomb:
+                    b_Discard = false;
+                break;
+            case PropType.other:
+                break;
+        }
+        if (b_Discard)
         {
             currentProp.Discard();
         }
+       
         InteractionObject _obj = model.mInteractionObject;
         model.Pickup();
         interactionSystem.StartInteraction(FullBodyBipedEffector.RightHand, _obj, false);

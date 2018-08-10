@@ -7,7 +7,7 @@ using RootMotion.FinalIK;
 //武器-攻击力, 防具-护甲值, 恢复剂-治疗量
 public class PropBaseModel : MonoBehaviour {
     [SerializeField]
-    public aSongUI_PropData.Prop prop;
+    public aSong_PlayerData.Prop prop;
     public PropName mName;
     public InteractionObject mInteractionObject;
     public InteractionTrigger[] mInteractionTriggers;
@@ -15,7 +15,7 @@ public class PropBaseModel : MonoBehaviour {
 
     private void Awake()
     {
-        prop = new aSongUI_PropData.Prop(mName);
+        prop = new aSong_PlayerData.Prop(mName);
         mInteractionObject = GetComponentInChildren<InteractionObject>();
         mInteractionTriggers = GetComponentsInChildren<InteractionTrigger>();
         r = GetComponent<Rigidbody>();

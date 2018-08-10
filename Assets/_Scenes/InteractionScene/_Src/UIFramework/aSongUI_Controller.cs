@@ -20,7 +20,7 @@ public class aSongUI_Controller {
         }
     }
 
-    public aSongUI_PropData playerProp;
+    public aSong_PlayerData playerData;
     public JsonData jd;
 
     private aSong_UIPropList mUIPropList;
@@ -33,19 +33,20 @@ public class aSongUI_Controller {
     {
         //NOTE : this is Test Init Here.
         jd = aSong_UnityJsonUtil.Read(Application.streamingAssetsPath, "AllProps", false);
-        playerProp = new aSongUI_PropData();
-        playerProp.dic_prop = new Dic_PropModel();
+        playerData = new aSong_PlayerData();
+        playerData.dic_listProp = new Dic_PropModel();
+        playerData.dic_bagProp = new Dic_PropModel();
+        
         Debug.Log(PropName.M416.ToString());
         
     }
 
     //在武器范围内，添加需要拾取的武器到List中并刷新
-
-    public void AddProp(PropBaseModel _model)
+    public void AddPropToList(PropBaseModel _model)
     {
-        if (_model == null || playerProp.dic_prop.ContainsKey(_model.prop.propID))
+        if (!playerData.AddListProp(_model))
             return;
-        playerProp.dic_prop.Add(_model.prop.propID,_model);
+        
         RefreshPropList();
     }
 
@@ -66,16 +67,14 @@ public class aSongUI_Controller {
         }
     }
 
-    public void RemoveProp(PropBaseModel _model)
+    public void RemovePropFromList(PropBaseModel _model)
     {
-        if (_model == null || !playerProp.dic_prop.ContainsKey(_model.prop.propID))
+        if (!playerData.RemoveListProp(_model))
             return;
-        playerProp.dic_prop.Remove(_model.prop.propID);
-        if(playerProp.dic_prop.Count<=0)
+        if(playerData.dic_listProp.Count<=0)
             TTUIPage.ClosePage<aSong_UIPropList>();
         else
             RefreshPropList();
-
     }
 
     public PropType GetPropType(PropName _name)
@@ -83,10 +82,28 @@ public class aSongUI_Controller {
         return (PropType)Enum.Parse(typeof(PropType), jd[_name.ToString()]["propType"].ToString());
     }
 
+    public float GetWeight(PropName _name)
+    {
+        return float.Parse(jd[_name.ToString()]["weight"].ToString());
+
+    }
+
     public void PickupProp(int _propID)
     {
-        PropBaseModel model = playerProp.dic_prop[_propID];
-        if(mUserCtrl.PickupProp(model))
-            RemoveProp(model);
+        PropBaseModel model = playerData.dic_listProp[_propID];
+        if (mUserCtrl.PickupProp(model))
+        {
+            //playerData.dic_bagProp
+            RemovePropFromList(model);
+
+        }
+    }
+
+    //点击按钮后，我们需要拿起武器或者收起武器
+    public void OnClickSkillItem()
+    {
+        aSongUI_PropListItem item = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.GetComponent<aSongUI_PropListItem>();
+        Debug.Log("propID = " + item.data.propID);
+        PickupProp(item.data.propID);
     }
 }

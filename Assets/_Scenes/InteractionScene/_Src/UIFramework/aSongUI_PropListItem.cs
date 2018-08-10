@@ -5,9 +5,9 @@ using UnityEngine.UI;
 
 public class aSongUI_PropListItem : MonoBehaviour {
 
-    public aSongUI_PropData.Prop data = null;
+    public aSong_PlayerData.Prop data = null;
 
-    public void Refresh(aSongUI_PropData.Prop prop)
+    public void Refresh(aSong_PlayerData.Prop prop)
     {
         this.data = prop;
         this.transform.Find("title").GetComponent<Text>().text = prop.name.ToString();

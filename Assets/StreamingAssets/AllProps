@@ -1,3 +1,5 @@
-﻿{"M416":{"propName":"M416", "propType":"bomb","instruction":"M416","attack":"10", "sort":"1"},
- "pistol":{"propName":"pistol", "propType":"bomb","instruction":"小手枪咯","attack":"1","sort":"2"}
+﻿{
+	"M416":{"propName":"M416", "propType":"rifle","instruction":"M416","attack":"10", "sort":"1","weight":"2"},
+	"pistol":{"propName":"pistol", "propType":"pistol","instruction":"小手枪咯","attack":"1","sort":"2","weight":"2"},
+	"M67":{"propName":"M67", "propType":"bomb","instruction":"片伤手雷","attack":"30","sort":"2","weight":"2"}
 }

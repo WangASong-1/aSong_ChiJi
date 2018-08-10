@@ -16,7 +16,7 @@ public class aSongUI_Contact : MonoBehaviour {
         if (model == null) return;
         if(!dic_propModel.ContainsKey(model.prop.propID))
             dic_propModel.Add(model.prop.propID, model);
-        aSongUI_Controller.Instance.AddProp(model);
+        aSongUI_Controller.Instance.AddPropToList(model);
     }
 
     public void OnTriggerExit(Collider c)
@@ -26,6 +26,6 @@ public class aSongUI_Contact : MonoBehaviour {
         if (model == null) return;
         if (dic_propModel.ContainsKey(model.prop.propID))
             dic_propModel.Remove(model.prop.propID);
-        aSongUI_Controller.Instance.RemoveProp(model);
+        aSongUI_Controller.Instance.RemovePropFromList(model);
     }
 }

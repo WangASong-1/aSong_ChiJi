@@ -65,11 +65,11 @@ public class aSong_UIPropList : TTUIPage
         //NOTE:here,maybe you havent Show(...pageData),ofcause you can got your skill data from your data singleton
         b_showed = true;
         this.gameObject.SetActive(true);
-        aSongUI_PropData propData = this.data != null ? this.data as aSongUI_PropData : aSongUI_Controller.Instance.playerProp;
-        Debug.Log("propData.props.Count = " + propData.dic_prop.Count);
+        aSong_PlayerData propData = this.data != null ? this.data as aSong_PlayerData : aSongUI_Controller.Instance.playerData;
+        Debug.Log("propData.props.Count = " + propData.dic_listProp.Count);
 
 
-        var enumerator = propData.dic_prop.GetEnumerator();
+        var enumerator = propData.dic_listProp.GetEnumerator();
         while (enumerator.MoveNext())
         {
             AddPropToItem(enumerator.Current.Value.prop);
@@ -84,7 +84,7 @@ public class aSong_UIPropList : TTUIPage
         */
     }
 
-    private void AddPropToItem(aSongUI_PropData.Prop prop)
+    private void AddPropToItem(aSong_PlayerData.Prop prop)
     {
         if (propItemsPool.Count <= 0)
             CreatePropItem(prop);
@@ -92,7 +92,7 @@ public class aSong_UIPropList : TTUIPage
             GetPropItemFromPool(prop);
     }
 
-    private void GetPropItemFromPool(aSongUI_PropData.Prop prop)
+    private void GetPropItemFromPool(aSong_PlayerData.Prop prop)
     {
         if (propItemsPool.Count <= 0)
             return;
@@ -104,7 +104,7 @@ public class aSong_UIPropList : TTUIPage
         return;
     }
 
-    private void CreatePropItem(aSongUI_PropData.Prop prop)
+    private void CreatePropItem(aSong_PlayerData.Prop prop)
     {
         GameObject go = GameObject.Instantiate(propItem) as GameObject;
         go.transform.SetParent(propItem.transform.parent);
@@ -116,15 +116,9 @@ public class aSong_UIPropList : TTUIPage
         propItems.Add(item);
         Debug.Log("CreatePropItem");
         //add click btn
-        go.AddComponent<Button>().onClick.AddListener(OnClickSkillItem);
+        go.AddComponent<Button>().onClick.AddListener(aSongUI_Controller.Instance.OnClickSkillItem);
     }
 
-    //点击按钮后，我们需要拿起武器或者收起武器
-    private void OnClickSkillItem()
-    {
-        aSongUI_PropListItem item = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.GetComponent<aSongUI_PropListItem>();
-        Debug.Log("propID = " + item.data.propID);
-        aSongUI_Controller.Instance.PickupProp(item.data.propID);
-    }
+    
     
 }
