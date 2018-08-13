@@ -172,7 +172,7 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
                     b_Discard = true;
                 break;
             case PropType.rifle:
-                if (aSongUI_Controller.Instance.playerData.Guns.Count >= 2)
+                if (aSongUI_Controller.Instance.playerData.GetGunNum() >= 2)
                     b_Discard = true;
                 break;
             case PropType.bomb:

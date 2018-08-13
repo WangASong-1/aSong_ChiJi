@@ -63,18 +63,49 @@ public class aSong_PlayerData {
     {
         if (model == null || dic_bagProp.ContainsValue(model))
             return;
-        dic_bagProp.Add(model.prop.propID, model);
         switch (model.prop.type)
         {
             case PropType.bomb:
+                bombs.Add(model);
                 break;
             case PropType.rifle:
+                if(guns.Count >= 2)
+                {
+                    //若2个rifle格子满了
+                    if(currentModel.prop.type == PropType.rifle)
+                    {
+                        //手上拿的也是rifle,那么替换
+                        dic_bagProp.Remove(currentModel.prop.propID);
+                        for(int i = 0; i < guns.Count; i++)
+                        {
+                            if( guns[i] == currentModel)
+                            {
+                                guns[i] = model;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //手上拿的不是rifle,那么扔掉第一个格子中的rifle
+                        dic_bagProp.Remove(guns[0].prop.propID);
+                        guns[0] = model;
+                    }
+                }
+                else
+                {
+                    //手上道具都没满,直接加入.
+                    guns.Add(model);
+                }
                 break;
             case PropType.pistol:
+                pistol = model;
                 break;
             case PropType.other:
+
                 break;
         }
+        currentModel = model;
+        dic_bagProp.Add(model.prop.propID, model);
         return;
     }
 
@@ -85,12 +116,20 @@ public class aSong_PlayerData {
         dic_bagProp.Remove(model.prop.propID);
         return;
     }
-    
 
-    private List<PropBaseModel> guns;
-    private PropBaseModel pistol;
-    private List<PropBaseModel> healths;
-    private List<PropBaseModel> bombs;
+    void ChangeProp(PropBaseModel mode)
+    {
+        if(currentModel.prop.type == mode.prop.type)
+        {
+
+        }
+    }
+
+    private PropBaseModel currentModel;
+    private List<PropBaseModel> guns = new List<PropBaseModel>();
+    private PropBaseModel pistol= new PropBaseModel();
+    private List<PropBaseModel> healths = new List<PropBaseModel>();
+    private List<PropBaseModel> bombs = new List<PropBaseModel>();
 
     public List<PropBaseModel> Guns
     {

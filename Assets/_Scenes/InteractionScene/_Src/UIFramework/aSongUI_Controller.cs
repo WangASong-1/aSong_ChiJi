@@ -50,6 +50,7 @@ public class aSongUI_Controller {
         RefreshPropList();
     }
 
+  
     void RefreshPropList()
     {
         if (mUIPropList == null)
@@ -77,6 +78,16 @@ public class aSongUI_Controller {
             RefreshPropList();
     }
 
+    void AddPropToBag(PropBaseModel _model)
+    {
+        playerData.AddBagProp(_model);
+    }
+
+    void RemovePropFromBag(PropBaseModel _model)
+    {
+        playerData.RemoveBagProp(_model);
+    }
+
     public PropType GetPropType(PropName _name)
     {
         return (PropType)Enum.Parse(typeof(PropType), jd[_name.ToString()]["propType"].ToString());
@@ -88,16 +99,24 @@ public class aSongUI_Controller {
 
     }
 
+    //ui中调用拾取:移除list中的model. 添加model 到对应的玩家背包list中
     public void PickupProp(int _propID)
     {
         PropBaseModel model = playerData.dic_listProp[_propID];
         if (mUserCtrl.PickupProp(model))
         {
-            //playerData.dic_bagProp
+            AddPropToBag(model);
             RemovePropFromList(model);
-
         }
     }
+
+    public void Discard(int _propID)
+    {
+        PropBaseModel model = playerData.dic_listProp[_propID];
+        RemovePropFromBag(model);
+    }
+
+
 
     //点击按钮后，我们需要拿起武器或者收起武器
     public void OnClickSkillItem()
