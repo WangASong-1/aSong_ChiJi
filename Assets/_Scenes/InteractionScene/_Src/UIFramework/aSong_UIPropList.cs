@@ -74,14 +74,6 @@ public class aSong_UIPropList : TTUIPage
         {
             AddPropToItem(enumerator.Current.Value.prop);
         }
-        /*
-        for (int i = 0; i < propData.dic_prop.Count; i++)
-        {
-            //CreatePropItem(propData.props[i]);
-            Debug.Log("propData.props.id = " + propData.dic_prop[i].prop.propID);
-            AddPropToItem(propData.dic_prop[i].prop);
-        }
-        */
     }
 
     private void AddPropToItem(aSong_PlayerData.Prop prop)

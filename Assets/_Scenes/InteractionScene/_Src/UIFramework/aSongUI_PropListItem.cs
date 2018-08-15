@@ -16,29 +16,36 @@ public class aSongUI_PropListItem : MonoBehaviour {
     public void Refresh(aSong_PlayerData.Prop prop)
     {
         this.data = prop;
-        if (this.transform.Find("title") != null)
+        if (title == null && this.transform.Find("title") != null)
         {
             title = this.transform.Find("title").GetComponent<Text>();
-            title.text = prop.name.ToString();
         }
+        if(title!= null)
+            title.text = prop.name.ToString();
 
-        if (this.transform.Find("Button") != null)
+        if (img == null && this.transform.Find("Button") != null)
         {
             img = this.transform.Find("Button").GetComponent<Image>();
-            img.sprite = prop.pic;
         }
+        if(img!=null)
+            img.sprite = prop.pic;
 
-        if (this.transform.Find("currentBullets") != null)
+
+        if (currentBullets == null && this.transform.Find("currentBullets") != null)
         {
             currentBullets = this.transform.Find("currentBullets").GetComponent<Text>();
-            currentBullets.text = 10.ToString();
         }
+        if(currentBullets!=null)
+            currentBullets.text = 10.ToString();
 
-        if (this.transform.Find("currentBullets") != null)
+
+        if (totalBbullets == null && this.transform.Find("totalBullets") != null)
         {
             totalBbullets = this.transform.Find("totalBullets").GetComponent<Text>();
-            totalBbullets.text = 20.ToString();
         }
-        
+        if(totalBbullets!=null)
+            totalBbullets.text = 20.ToString();
+
+
     }
 }

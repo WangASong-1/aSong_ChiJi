@@ -41,8 +41,27 @@ public class aSong_PlayerData {
     //玩家拾取了的 Dic
     //list中的prop
     public Dic_PropModel dic_listProp;
+    //背包dic
     public Dic_PropModel dic_bagProp;
 
+
+    public bool PropInList(int id)
+    {
+        return dic_listProp.ContainsKey(id);
+    }
+
+    public PropBaseModel GetListProp(int id)
+    {
+        return dic_listProp[id];
+    }
+    public bool PropInBag(int id)
+    {
+        return dic_bagProp.ContainsKey(id);
+    }
+    public PropBaseModel GetBagProp(int id)
+    {
+        return dic_bagProp[id];
+    }
     public bool AddListProp(PropBaseModel model)
     {
         if (model == null || dic_listProp.ContainsValue(model))
@@ -117,12 +136,20 @@ public class aSong_PlayerData {
         return;
     }
 
-    void ChangeProp(PropBaseModel mode)
+    public PropBaseModel PickupProp(int propID)
     {
-        if(currentModel.prop.type == mode.prop.type)
+        PropBaseModel model = null;
+        if (dic_listProp.ContainsKey(propID))
         {
-
+            model = dic_listProp[propID];
+            dic_listProp.Remove(propID);
         }
+        if (dic_bagProp.ContainsKey(propID))
+        {
+            model = dic_bagProp[propID];
+            dic_bagProp.Remove(propID);
+        }
+        return model;
     }
 
     private PropBaseModel currentModel;

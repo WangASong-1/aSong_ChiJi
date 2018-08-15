@@ -102,12 +102,30 @@ public class aSongUI_Controller {
     //ui中调用拾取:移除list中的model. 添加model 到对应的玩家背包list中
     public void PickupProp(int _propID)
     {
-        PropBaseModel model = playerData.dic_listProp[_propID];
-        if (mUserCtrl.PickupProp(model))
+        PropBaseModel model;
+        if (playerData.PropInBag(_propID))
         {
-            AddPropToBag(model);
-            RemovePropFromList(model);
-            TTUIPage.ShowPage<aSongUI_Main>();
+            model = playerData.GetBagProp(_propID);
+            if (mUserCtrl.PickupProp(model))
+            {
+                //AddPropToBag(model);
+                //RemovePropFromList(model);
+                TTUIPage.ShowPage<aSongUI_Main>();
+                return;
+            }
+        }
+
+        if (playerData.PropInList(_propID))
+        {
+            //list里面更新的话就需要
+            model = playerData.GetListProp(_propID);
+            if (mUserCtrl.PickupProp(model))
+            {
+                AddPropToBag(model);
+                RemovePropFromList(model);
+                TTUIPage.ShowPage<aSongUI_Main>();
+                return;
+            }
         }
     }
 
