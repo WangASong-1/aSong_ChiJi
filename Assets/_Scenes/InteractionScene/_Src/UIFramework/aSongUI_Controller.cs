@@ -107,6 +107,7 @@ public class aSongUI_Controller {
         {
             AddPropToBag(model);
             RemovePropFromList(model);
+            TTUIPage.ShowPage<aSongUI_Main>();
         }
     }
 
