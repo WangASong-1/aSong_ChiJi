@@ -21,17 +21,31 @@ public class PropBaseModel : MonoBehaviour {
         r = GetComponent<Rigidbody>();
     }
 
-    public void Pickup()
+    public void Pickup(GameObject player)
     {
+        if (r != null)
+        {
+            r.isKinematic = true;
+        }
         for (int i = 0; i < mInteractionTriggers.Length; i++)
         {
             mInteractionTriggers[i].gameObject.SetActive(false);
+        }
+
+        if (player.GetComponent<Collider>() != null)
+        {
+            var colliders = GetComponentsInChildren<Collider>();
+
+            foreach (Collider collider in colliders)
+            {
+                if (!collider.isTrigger) Physics.IgnoreCollision(player.GetComponent<Collider>(), collider);
+            }
         }
     }
 
     public void Discard()
     {
-        Debug.Log(prop.name.ToString());
+        Debug.Log("PropBaseModel::Discard :" + prop.name.ToString());
         if(transform.parent != null)
         {
             var poser = transform.parent.GetComponent<Poser>();

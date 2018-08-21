@@ -1,5 +1,42 @@
 ﻿{
-	"M416":{"propName":"M416", "propType":"rifle","instruction":"M416","attack":"10", "sort":"1","weight":"2"},
-	"pistol":{"propName":"pistol", "propType":"pistol","instruction":"小手枪咯","attack":"1","sort":"2","weight":"2"},
-	"M67":{"propName":"M67", "propType":"bomb","instruction":"片伤手雷","attack":"30","sort":"2","weight":"2"}
+    "M416": {
+        "propName": "M416",
+        "propType": "rifle",
+        "instruction": "这是一把M416",
+        "attack": "10",
+        "sort": "1",
+        "weight": "2"
+    },
+    "M14": {
+        "propName": "M14",
+        "propType": "rifle",
+        "instruction": "这是一把M14",
+        "attack": "10",
+        "sort": "1",
+        "weight": "2"
+    },
+    "AK47": {
+        "propName": "AK47",
+        "propType": "rifle",
+        "instruction": "这是一把AK47",
+        "attack": "10",
+        "sort": "1",
+        "weight": "2"
+    },
+    "pistol": {
+        "propName": "pistol",
+        "propType": "pistol",
+        "instruction": "小手枪咯",
+        "attack": "1",
+        "sort": "2",
+        "weight": "2"
+    },
+    "M67": {
+        "propName": "M67",
+        "propType": "bomb",
+        "instruction": "片伤手雷",
+        "attack": "30",
+        "sort": "2",
+        "weight": "2"
+    }
 }

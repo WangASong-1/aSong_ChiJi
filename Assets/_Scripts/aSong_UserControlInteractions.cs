@@ -148,61 +148,94 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
        
     }
 
-    void PutInBag()
+    //控制器只负责手上的道具,手上有道具时该丢的丢该放背包的放背包
+    void PutCurrentInBag()
     {
-        if (aSongUI_Controller.Instance.playerData.GetGunNum() >= 2)
-        {
-            if (currentProp != null)
-            {
-                currentProp.Discard();
-            }
-        }
+        currentProp = null;
+        animator.SetLayerWeight(1, 0);
+        interactionSystem.StopInteraction(FullBodyBipedEffector.RightHand);
+        interactionSystem.StopInteraction(FullBodyBipedEffector.LeftHand);
 
+        
+        var poser = animator.GetBoneTransform(HumanBodyBones.RightHand).GetComponent<Poser>();
+        if (poser != null)
+        {
+            poser.poseRoot = null;
+            poser.weight = 0f;
+        }
+        poser = animator.GetBoneTransform(HumanBodyBones.LeftHand).GetComponent<Poser>();
+        if (poser != null)
+        {
+            poser.poseRoot = null;
+            poser.weight = 0f;
+        }
     }
 
-    public bool PickupProp(PropBaseModel model)
+    void PutPropInBag(PropBaseModel prop)
+    {
+        prop.transform.parent = weaponPoint[0];
+        prop.transform.localPosition = Vector3.zero;
+        prop.transform.localEulerAngles = Vector3.zero;
+    }
+
+    public bool PickupProp(PropBaseModel model, bool b_propFromBag = false)
     {
         if (interactionSystem.IsInInteraction(FullBodyBipedEffector.RightHand))
             return false;
 
-        bool b_Discard = false;
-        switch (model.prop.type)
+        bool b_IsBagFull = false;
+        bool b_needGrab = true;
+
+        if (b_propFromBag)
         {
-            case PropType.pistol:
-                if (aSongUI_Controller.Instance.playerData.Pistol != null)
-                    b_Discard = true;
-                break;
-            case PropType.rifle:
-                if (aSongUI_Controller.Instance.playerData.GetGunNum() >= 2)
-                    b_Discard = true;
-                break;
-            case PropType.bomb:
-                    b_Discard = false;
-                break;
-            case PropType.other:
-                break;
+            //从背包里拿出来的道具,那么直接将手上的道具放背包去
+            if (currentProp != null)
+            {
+                PutPropInBag(currentProp);
+                PutCurrentInBag();
+                b_needGrab = true;
+            }
+            if (model == null)
+            {
+                return true;
+            }
         }
-        if (b_Discard)
+
+        b_IsBagFull = aSongUI_Controller.Instance.playerData.IsBagFull(model);
+
+        //手上有道具，但是背包没满,直接放入背包
+        model.Pickup(gameObject);
+        if (currentProp != null && !b_IsBagFull)
         {
+            PutPropInBag(model);
+            b_needGrab = false;
+            model = null;
+        }
+
+        if (b_IsBagFull && !b_propFromBag)
+        {
+            //背包满了,并且这个也不是从背包拿出来的,丢掉
             currentProp.Discard();
         }
-       
-        InteractionObject _obj = model.mInteractionObject;
-        model.Pickup();
-        interactionSystem.StartInteraction(FullBodyBipedEffector.RightHand, _obj, false);
-        interactionSystem.StartInteraction(FullBodyBipedEffector.LeftHand, _obj, false);
-        if (model.prop.name == PropName.M416)
-        {
-            
-            animator.SetLayerWeight(1, 1);
-        }
-        else
-        {
-            animator.SetLayerWeight(1, 0);
 
-        }
-
+        //aSong:这里又问题,连续捡第三个报错
+        1111
         currentProp = model;
+
+        if (b_needGrab)
+        {
+            InteractionObject _obj = model.mInteractionObject;
+            interactionSystem.StartInteraction(FullBodyBipedEffector.RightHand, _obj, false);
+            interactionSystem.StartInteraction(FullBodyBipedEffector.LeftHand, _obj, false);
+            if (model.prop.name == PropName.M416)
+            {
+                animator.SetLayerWeight(1, 1);
+            }
+            else
+            {
+                animator.SetLayerWeight(1, 0);
+            }
+        }
         return true;
     }
 

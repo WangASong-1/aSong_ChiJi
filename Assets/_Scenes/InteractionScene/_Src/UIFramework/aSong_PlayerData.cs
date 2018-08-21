@@ -5,7 +5,7 @@ using UnityEngine;
 //道具名. 
 public enum PropName
 {
-    pistol, M416, M67 ,other
+    pistol, M416, M67 ,AK47,M14,  other
 }
 
 //道具种类:射手步枪,冲锋枪,雷
@@ -152,6 +152,29 @@ public class aSong_PlayerData {
         return model;
     }
 
+    public bool IsBagFull(PropBaseModel model)
+    {
+        bool b_Discard = false;
+
+        switch (model.prop.type)
+        {
+            case PropType.pistol:
+                if (pistol != null)
+                    b_Discard = true;
+                break;
+            case PropType.rifle:
+                if (GetGunNum() >= 2)
+                    b_Discard = true;
+                break;
+            case PropType.bomb:
+                b_Discard = false;
+                break;
+            case PropType.other:
+                break;
+        }
+        return b_Discard;
+    }
+
     private PropBaseModel currentModel;
     private List<PropBaseModel> guns = new List<PropBaseModel>();
     private PropBaseModel pistol= new PropBaseModel();
@@ -187,6 +210,19 @@ public class aSong_PlayerData {
         get
         {
             return bombs;
+        }
+    }
+
+    public PropBaseModel CurrentModel
+    {
+        get
+        {
+            return currentModel;
+        }
+
+        set
+        {
+            currentModel = value;
         }
     }
 

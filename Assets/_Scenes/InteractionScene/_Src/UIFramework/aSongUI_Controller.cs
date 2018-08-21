@@ -5,6 +5,8 @@ using TinyTeam.UI;
 using LitJson;
 using System;
 
+//这里我不想要将每个按钮都弄成 TTUIPage来单独刷新按钮内容.
+//当有道具拾取了或者按钮被点击了.都来 Controller里面来执行各自定义的事件.代理
 public class aSongUI_Controller {
     private static aSongUI_Controller m_instance;
     public static aSongUI_Controller Instance
@@ -105,11 +107,23 @@ public class aSongUI_Controller {
         PropBaseModel model;
         if (playerData.PropInBag(_propID))
         {
+            //从背包中拿出
             model = playerData.GetBagProp(_propID);
-            if (mUserCtrl.PickupProp(model))
+            Debug.Log("_propID = " + _propID);
+            if(playerData.CurrentModel !=null)
+                Debug.Log("playerData.CurrentModel ID = " + playerData.CurrentModel.prop.propID);
+            if (model == playerData.CurrentModel)
+            {
+                //当前拿的就是这把武器,那么就收起放背后
+                model = null;
+                Debug.Log("放背后呀");
+            }
+            if (mUserCtrl.PickupProp(model, true))
             {
                 //AddPropToBag(model);
                 //RemovePropFromList(model);
+                playerData.CurrentModel = model;
+
                 TTUIPage.ShowPage<aSongUI_Main>();
                 return;
             }
@@ -141,7 +155,8 @@ public class aSongUI_Controller {
     public void OnClickSkillItem()
     {
         aSongUI_PropListItem item = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.GetComponent<aSongUI_PropListItem>();
-        Debug.Log("propID = " + item.data.propID);
+        //Debug.Log("propID = " + item.data.propID);
+        //Debug.Log("name = " + item.name);
         PickupProp(item.data.propID);
     }
 }

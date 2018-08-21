@@ -46,7 +46,7 @@ public class aSong_UIPropList : TTUIPage
 
     public override void Hide()
     {
-        Debug.Log("Hide");
+        //Debug.Log("Hide");
         b_showed = false;
         for (int i = 0; i < propItems.Count; i++)
         {
