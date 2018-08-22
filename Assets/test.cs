@@ -17,5 +17,8 @@ public class test : MonoBehaviour {
         //aSong_UnityJsonUtil.SetString("123", "456");
         //aSong_UnityJsonUtil.Save(true);
         aSong_UnityJsonUtil.Read();
+
+        //相当于将该物体放到偏移该物体指定该位移值的位置(坐标系是以该物体)
+        transform.position = transform.rotation * new Vector3(0.02f, -0.6f, 0);
     }
 }
