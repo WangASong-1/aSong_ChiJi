@@ -151,7 +151,6 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
     //控制器只负责手上的道具,手上有道具时该丢的丢该放背包的放背包
     void PutCurrentInBag()
     {
-        currentProp = null;
         animator.SetLayerWeight(1, 0);
         interactionSystem.StopInteraction(FullBodyBipedEffector.RightHand);
         interactionSystem.StopInteraction(FullBodyBipedEffector.LeftHand);
@@ -178,20 +177,23 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
         prop.transform.localEulerAngles = Vector3.zero;
     }
 
-    public bool PickupProp(PropBaseModel model, bool b_propFromBag = false)
+    public bool PickupProp(PropBaseModel current, PropBaseModel model, bool b_propFromBag = false)
     {
         if (interactionSystem.IsInInteraction(FullBodyBipedEffector.RightHand))
+        {
+            Debug.LogError("我在动画中不方便拿东西");
             return false;
+        }
 
         bool b_IsBagFull = false;
         bool b_needGrab = true;
-
+        currentProp = current;
         if (b_propFromBag)
         {
             //从背包里拿出来的道具,那么直接将手上的道具放背包去
-            if (currentProp != null)
+            if (current != null)
             {
-                PutPropInBag(currentProp);
+                PutPropInBag(current);
                 PutCurrentInBag();
                 b_needGrab = true;
             }
@@ -208,7 +210,7 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
         if (!b_IsBagFull)
         {
             //背包没满
-            if (currentProp != null)
+            if (current != null)
             {
                 //手上有道具，但是背包没满,直接放入背包
                 PutPropInBag(model);
@@ -222,12 +224,10 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
             if (!b_propFromBag)
             {
                 //从地上捡起来道具，丢掉手上的
-                currentProp.Discard();
+                current.Discard();
             }
            
         }
-        //除了直接放入背包
-        currentProp = model? model : currentProp;
 
         if (b_needGrab)
         {
@@ -244,20 +244,5 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
             }
         }
         return true;
-    }
-
-    //丢掉指定道具,为空就是丢掉手上道具
-    public void Discard(PropBaseModel model = null)
-    {
-        if(currentProp == model || (currentProp!=null && model==null))
-        {
-            currentProp = null;
-            animator.SetLayerWeight(1, 0);
-            interactionSystem.StopInteraction(FullBodyBipedEffector.RightHand);
-            interactionSystem.StopInteraction(FullBodyBipedEffector.LeftHand);
-
-        }
-        model.Discard();
-
     }
 }

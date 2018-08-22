@@ -116,7 +116,7 @@ public class aSongUI_Controller {
                 model = null;
                 Debug.Log("放背后呀");
             }
-            if (mUserCtrl.PickupProp(model, true))
+            if (mUserCtrl.PickupProp(playerData.CurrentModel, model, true))
             {
                 //AddPropToBag(model);
                 //RemovePropFromList(model);
@@ -131,7 +131,7 @@ public class aSongUI_Controller {
         {
             //list里面更新的话就需要
             model = playerData.GetListProp(_propID);
-            if (mUserCtrl.PickupProp(model))
+            if (mUserCtrl.PickupProp(playerData.CurrentModel,model))
             {
                 AddPropToBag(model);
                 RemovePropFromList(model);
