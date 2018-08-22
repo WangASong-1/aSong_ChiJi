@@ -78,6 +78,7 @@ public class aSong_PlayerData {
         return true;
     }
 
+    //道具放入背包.有丢掉判断
     public void AddBagProp(PropBaseModel model)
     {
         if (model == null || dic_bagProp.ContainsValue(model))
@@ -102,6 +103,7 @@ public class aSong_PlayerData {
                                 guns[i] = model;
                             }
                         }
+                        currentModel = model;
                     }
                     else
                     {
@@ -109,10 +111,11 @@ public class aSong_PlayerData {
                         dic_bagProp.Remove(guns[0].prop.propID);
                         guns[0] = model;
                     }
+
                 }
                 else
                 {
-                    //手上道具都没满,直接加入.
+                    //手上道具都没满,直接加入.不换枪
                     guns.Add(model);
                 }
                 break;
@@ -123,7 +126,9 @@ public class aSong_PlayerData {
 
                 break;
         }
-        currentModel = model;
+        if(currentModel == null)
+            currentModel = model;
+
         dic_bagProp.Add(model.prop.propID, model);
         return;
     }

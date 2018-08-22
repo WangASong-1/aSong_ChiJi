@@ -195,6 +195,7 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
                 PutCurrentInBag();
                 b_needGrab = true;
             }
+            //这个是
             if (model == null)
             {
                 return true;
@@ -203,24 +204,30 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
 
         b_IsBagFull = aSongUI_Controller.Instance.playerData.IsBagFull(model);
 
-        //手上有道具，但是背包没满,直接放入背包
         model.Pickup(gameObject);
-        if (currentProp != null && !b_IsBagFull)
+        if (!b_IsBagFull)
         {
-            PutPropInBag(model);
-            b_needGrab = false;
-            model = null;
+            //背包没满
+            if (currentProp != null)
+            {
+                //手上有道具，但是背包没满,直接放入背包
+                PutPropInBag(model);
+                b_needGrab = false;
+                model = null;
+            }
         }
-
-        if (b_IsBagFull && !b_propFromBag)
+        else
         {
-            //背包满了,并且这个也不是从背包拿出来的,丢掉
-            currentProp.Discard();
+            //背包满了
+            if (!b_propFromBag)
+            {
+                //从地上捡起来道具，丢掉手上的
+                currentProp.Discard();
+            }
+           
         }
-
-        //aSong:这里又问题,连续捡第三个报错
-        1111
-        currentProp = model;
+        //除了直接放入背包
+        currentProp = model? model : currentProp;
 
         if (b_needGrab)
         {

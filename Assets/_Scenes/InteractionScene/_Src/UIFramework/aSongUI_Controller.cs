@@ -34,12 +34,10 @@ public class aSongUI_Controller {
     private aSongUI_Controller()
     {
         //NOTE : this is Test Init Here.
-        jd = aSong_UnityJsonUtil.Read(Application.streamingAssetsPath, "AllProps", false);
+        jd = aSong_UnityJsonUtil.Read("AllProps");
         playerData = new aSong_PlayerData();
         playerData.dic_listProp = new Dic_PropModel();
         playerData.dic_bagProp = new Dic_PropModel();
-        
-        Debug.Log(PropName.M416.ToString());
         
     }
 
