@@ -64,9 +64,9 @@ public class WallClimber : MonoBehaviour {
     void Update()
     {
         //1. w按钮刚按下就开始爬墙
-        if (currentSort == Climbingsort.Walking && Input.GetAxis("Vertical") > 0)
-            StartClimbing();
-        
+        //if (currentSort == Climbingsort.Walking && Input.GetAxis("Vertical") > 0)
+        //StartClimbing();
+        /*
         if (currentSort == Climbingsort.Climbing)
             Climb();
 
@@ -77,7 +77,28 @@ public class WallClimber : MonoBehaviour {
 
         if (currentSort == Climbingsort.Jumping || currentSort == Climbingsort.Falling)
             Jumping();
-            
+            */
+
+        UpdateStats();
+        switch (currentSort)
+        {
+            case Climbingsort.Climbing:
+                Climb();
+                break;
+            case Climbingsort.checkingForClimbStart:
+                break;
+            case Climbingsort.ClimbingTowardPlateau:
+            case Climbingsort.ClimbingTowardsPoint:
+                MoveTowardsPoint();
+                break;
+            case Climbingsort.Falling:
+            case Climbingsort.Jumping:
+                Jumping();
+                break;
+            case Climbingsort.Walking:
+                //Walking();
+                break;
+        }
     }
 
     public void UpdateStats()
@@ -97,6 +118,18 @@ public class WallClimber : MonoBehaviour {
         //走路状态并且只要在移动(包括惯性),那么开始检查面前是否有墙可爬
         if (currentSort == Climbingsort.Walking && (Input.GetAxis("Vertical") != 0 || Input.GetAxis("Horizontal") != 0))
             CheckForClimbStart();
+
+        if(!TPC.m_IsGrounded && (currentSort == Climbingsort.Climbing || currentSort == Climbingsort.ClimbingTowardPlateau || currentSort == Climbingsort.ClimbingTowardsPoint))
+        {
+            animator.SetBool("Climbing", true);
+        }
+        else
+        {
+            animator.SetBool("Climbing", false);
+            animator.SetBool("ClimbUp", false);
+            animator.SetBool("ClimbDown", false);
+            rigid.isKinematic = false;
+        }
     }
 
     /// <summary>
@@ -154,8 +187,10 @@ public class WallClimber : MonoBehaviour {
             //上下爬动检测
             if(Input.GetAxis("Vertical") > 0)
             {
-                CheckForSpots(HandTrans.position + transform.rotation * VerticalHandOffset + transform.up * ClimbRange, -transform.up, ClimbRange, CheckingSort.nomal);
+                //Debug.LogError(12);
+                CheckForSpots(HandTrans.position + transform.rotation * VerticalHandOffset + transform.up * ClimbRange * 0.5f, -transform.up, ClimbRange * 0.5f, CheckingSort.nomal);
 
+                //当没有检测到上面有障碍物,就爬平台
                 if (currentSort != Climbingsort.ClimbingTowardsPoint)
                     CheckForPlateau();
             }
@@ -170,6 +205,8 @@ public class WallClimber : MonoBehaviour {
                     TPUC.enabled = true;
                     currentSort = Climbingsort.Falling;
                     oldRotation = transform.rotation;
+
+                    animator.SetBool("ClimbDown", true);
                 }
             }
 
@@ -217,7 +254,6 @@ public class WallClimber : MonoBehaviour {
         bool foundspot = false;
         if(Physics.Raycast(Spotlocation - transform.right*SmallestEdge/2, dir, out hit, range, SpotLayer))
         {
-            Debug.Log("22");
             if(Vector3.Distance(HandTrans.position , hit.point) - SmallestEdge / 1.5f > minDistance)
             {
                 foundspot = true;
@@ -229,7 +265,6 @@ public class WallClimber : MonoBehaviour {
         {
             if (Physics.Raycast(Spotlocation + transform.right * SmallestEdge / 2, dir, out hit, range, SpotLayer))
             {
-                Debug.Log("22");
                 if (Vector3.Distance(HandTrans.position, hit.point) - SmallestEdge / 1.5f > minDistance)
                 {
                     foundspot = true;
@@ -242,7 +277,6 @@ public class WallClimber : MonoBehaviour {
         {
             if (Physics.Raycast(Spotlocation + transform.right * SmallestEdge / 2 + transform.forward*SmallestEdge, dir, out hit, range, SpotLayer))
             {
-                Debug.Log("22");
                 if (Vector3.Distance(HandTrans.position, hit.point) > minDistance)
                 {
                     foundspot = true;
@@ -255,7 +289,6 @@ public class WallClimber : MonoBehaviour {
         {
             if (Physics.Raycast(Spotlocation - transform.right * SmallestEdge / 2 + transform.forward * SmallestEdge, dir, out hit, range, SpotLayer))
             {
-                Debug.Log("22");
                 if (Vector3.Distance(HandTrans.position, hit.point) > minDistance)
                 {
                     foundspot = true;
@@ -392,7 +425,7 @@ public class WallClimber : MonoBehaviour {
         float distance = Vector3.Distance(transform.position, (TargetPoint - transform.rotation * HandTrans.localPosition));
         //跳跃动画程度控制
         float percent = -9 * (BeginDistance - distance) / BeginDistance;
-        Debug.Log("percent = " + percent);
+        //Debug.Log("percent = " + percent);
 
         animator.SetFloat("Jump", percent);
         
@@ -452,11 +485,13 @@ public class WallClimber : MonoBehaviour {
         RaycastHit hit2;
 
         Vector3 dir = transform.up + transform.forward / 4;
+        //Debug.LogError("CheckForPlateau11111");
 
         //上前方没有障碍物了，说明上面是平台顶端
-        if(!Physics.Raycast(HandTrans.position+transform.rotation*VerticalHandOffset,dir, out hit2, 1.5f, SpotLayer))
+        if (!Physics.Raycast(HandTrans.position+transform.rotation*VerticalHandOffset,dir, out hit2, 1.5f, SpotLayer))
         {
             currentSort = Climbingsort.ClimbingTowardPlateau;
+            animator.SetBool("ClimbUp", true);
             //Debug.LogError("CheckForPlateau");
             //上方
             if (Physics.Raycast(HandTrans.position + dir * 1.5f, -Vector3.up, out hit2, 1.7f, SpotLayer))
@@ -473,12 +508,11 @@ public class WallClimber : MonoBehaviour {
 
             }
             TargetNormal = -transform.forward;
-            Debug.DrawRay(HandTrans.position + dir * 1.5f, -Vector3.up*1.7f, Color.yellow);
-            Debug.Log("TargetPoint = " + TargetPoint);
+            //Debug.DrawRay(HandTrans.position + dir * 1.5f, -Vector3.up*1.7f, Color.yellow);
+            //Debug.Log("TargetPoint = " + TargetPoint);
             //Debug.LogError("CheckForPlateau");
             animator.SetBool("Crouch", true);
             animator.SetBool("OnGround", true);
-            animator.SetBool("Climbing", false);
         }
     }
 
