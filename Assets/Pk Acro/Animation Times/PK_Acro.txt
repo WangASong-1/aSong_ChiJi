@@ -1,0 +1,130 @@
+Animation File	Animation Description	Frame Range (@30fps)	
+			
+Idle	Idle Ready	Frame 1 - 76	
+	Idle Standing	77 - 136	
+			
+Walk Forward	Walk Forward	Frame 1 - 32	
+			
+Walk Backward	Walk Backward	Frame 1 - 32	
+			
+Run Forward	Run Forward	Frame 1 - 18	
+			
+Run Backward	Run Backward	Frame 1 - 21	
+			
+Sprint	Sprint Forward	Frame 1 - 16	
+			
+			
+			
+Back-Hand-Spring	BHS Backsault	Frame 1 - 70	
+	BHS x3 Backsault	71 - 173	
+	BHS Double Fulltwist	174 - 248	
+	BHS Double Backsault	249 - 323	
+	BHS Flash-Kick	324 - 388	
+	BHS Fulltwist	389 - 453	
+			
+Cartwheel	CW	Frame 1 - 25	
+	CW Backsault	26 - 90	
+	CW Double Backsault	91 - 160	
+	CW Double Frontsault	161 - 220	
+	CW Double Fulltwist	221 - 295	
+	CW Flashkick	296 - 360	
+	CW Frontsault	361 - 410	
+	CW Fulltwist	411 - 470	
+			
+GAP Frontsault	Gap 1M	Frame 1 - 45	
+	Gap 2M	46 - 90	
+	Gap 3M	91 - 135	
+			
+GAP Gainer	Gap 1M	Frame 1 - 55	
+	Gap 2M	56 - 110	
+	Gap 3M	111 - 165	
+			
+GAP Jump	Gap 2M	Frame 1 - 50	
+	Gap 3M	51 - 100	
+	Gap 4M	101 - 150	
+	Gap 5M	151 - 200	
+	Gap 6M	201 - 250	
+	Gap 8M	251 - 300	
+			
+Jumping	Take-Off	Frame 1 - 25	
+	Airtime	26 - 85	
+	Land	86 - 115	
+	Jump Long High	116 - 155	
+			
+Mantle Drop	Drop 1M	Frame 1 - 35	
+	Drop 2M	36 - 75	
+	Drop 3M	76 - 115	
+	Drop 4M	116 - 155	
+	Drop 5M	156 - 197	
+			
+Mantle Gainer	Drop 1M	Frame 1 - 45	
+	Drop 2M	46 - 95	
+	Drop 3M	96 - 145	
+	Drop 4M	146 - 195	
+	Drop 5M	196 - 248	
+			
+Mantle Climb	Frontsault 1M	Frame 1 - 30	
+	Climb 1M	31 - 60	
+	Climb 2M	61 - 100	
+	Climb 3M	101 - 135	
+	Climb 4M	136 - 185	
+	Climb 5M	186 - 235	
+			
+Round-Off	RO Backsault	Frame 1 - 65	
+	RO BHS Backsault	66 - 145	
+	RO Double Backsault	146 - 210	
+	RO Double Fulltwist	211 - 280	
+	RO Flashkick	281 - 340	
+	RO Fulltwist	341 - 400	
+			
+Rolls	Roll Forward	Frame 1 - 30	
+	Roll Backward	31 - 60	
+	Roll Left	61 - 90	
+	Roll Right	91 - 120	
+	Roll FWD Frontsault	121 - 175	
+	Roll FWD Double Frontsault	176 - 240	
+	Roll BWD Backsault	241 - 305	
+	Roll BWD Double Backsault	306 - 375	
+	Roll LFT Sideflip	376 - 430	
+	Roll RGT Sideflip	431 - 485	
+			
+Running Tricks	Frontsault	Frame 1 - 45	
+	Double Frontsault	46 - 100	
+	Gainer	101 - 155	
+	Gainer Flash	156 - 215	
+			
+Standing Tricks	Backsault	Frame 1 - 65	
+	Flashkick	66 - 125	
+	Fulltwist	126 - 185	
+	Double Backsault	186 - 255	
+	Double Fulltwist	256 - 320	
+	Frontsault	321 - 355	
+	Double Frontsault	356 - 400	
+	Sideflip Left	401 - 435	
+	Sideflip Right	436 - 470	
+			
+Kong Vault	Vault 1M	Frame 1 - 50	
+	Vault 2M	51 - 100	
+	Vault 3M	101 - 150	
+	Vault 4M	151 - 205	
+	Vault 5M	206 - 260	
+			
+One-Hand Vault	Vault 1M	Frame 1 - 35	
+	Vault 2M	36 - 75	
+	Vault 3M	76 - 120	
+	Vault 4M	121 - 165	
+	Vault 5M	166 - 215	
+			
+Climb Over	Wall 1M	Frame 1 - 40	
+	Wall 2M	41 - 90	
+	Wall 3M	91 - 145	
+	Wall 4M	146 - 210	
+	Wall 5M	211 - 277	
+			
+Websters	Webster	Frame 1 - 25	
+	Webster Tucked	26 - 55	
+			
+Ledge Hanging	Climb Up	Frame 1 - 83	
+	Hanging Idle	84 - 143	
+	Drop Down	144 - 218	
+	Drop Down Reversed	219 - 293	103 Anims

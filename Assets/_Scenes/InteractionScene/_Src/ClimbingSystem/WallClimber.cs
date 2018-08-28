@@ -24,10 +24,22 @@ public class WallClimber : MonoBehaviour {
     public Rigidbody rigid;
     //人总是站着的.
     public Vector3 raycastPosition = new Vector3(0, 1, 0);
+    /// <summary>
+    /// 人物移动等操作方法.在爬动过程中(currentSort == Climbing)禁用
+    /// </summary>
     public ThirdPersonUserControl TPUC;
     public ThirdPersonCharacter TPC;
+    /// <summary>
+    /// 上下爬动的时候的偏移
+    /// </summary>
     public Vector3 VerticalHandOffset = new Vector3(0, 0, 0.03f);
+    /// <summary>
+    /// 左右爬动的时候的偏移
+    /// </summary>
     public Vector3 HorizontalHandOffset = new Vector3(0,0.2f,0.03f);
+    /// <summary>
+    /// 跳起和下落的时候使用的偏移
+    /// </summary>
     public Vector3 fallHandOffset = new Vector3(0,0.2f,0);
     public LayerMask SpotLayer;
     public LayerMask CurrentSpotLayer;
@@ -85,7 +97,6 @@ public class WallClimber : MonoBehaviour {
         //走路状态并且只要在移动(包括惯性),那么开始检查面前是否有墙可爬
         if (currentSort == Climbingsort.Walking && (Input.GetAxis("Vertical") != 0 || Input.GetAxis("Horizontal") != 0))
             CheckForClimbStart();
-
     }
 
     /// <summary>
@@ -107,7 +118,7 @@ public class WallClimber : MonoBehaviour {
     }
      
     /// <summary>
-    /// jumping 还是 falling 状态判断
+    /// jumping 和 falling 状态判断,以及他们的攀爬点检测
     /// </summary>
     public void Jumping()
     {
@@ -121,9 +132,11 @@ public class WallClimber : MonoBehaviour {
         if (rigid.velocity.y > 0 && currentSort != Climbingsort.Jumping)
             currentSort = Climbingsort.Jumping;
 
+        //跳起的时候检测点往上移一点点，预测
         if (currentSort == Climbingsort.Jumping)
             CheckForSpots(HandTrans.position + fallHandOffset , -transform.up, 0.1f, CheckingSort.nomal);
         
+        //下落的时候，检测的点往下移一点点.
         if(currentSort == Climbingsort.Falling)
         {
             CheckForSpots(HandTrans.position + fallHandOffset + transform.rotation * new Vector3(0.02f, -0.6f, 0), -transform.up, 0.4f, CheckingSort.nomal);
@@ -131,10 +144,14 @@ public class WallClimber : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// 爬动方法.进行下一次爬动的预先计算
+    /// </summary>
     public void Climb()
     {
         if(Time.time - lasttime > CoolDown && currentSort == Climbingsort.Climbing)
         {
+            //上下爬动检测
             if(Input.GetAxis("Vertical") > 0)
             {
                 CheckForSpots(HandTrans.position + transform.rotation * VerticalHandOffset + transform.up * ClimbRange, -transform.up, ClimbRange, CheckingSort.nomal);
@@ -156,35 +173,40 @@ public class WallClimber : MonoBehaviour {
                 }
             }
 
+            //左右爬动检测
             if (Input.GetAxis("Horizontal") != 0)
             {
-                CheckForSpots(HandTrans.position + transform.rotation * HorizontalHandOffset,transform.right*Input.GetAxis("Horizontal") - transform.up/3.5f, ClimbRange/2, CheckingSort.nomal);
+                CheckForSpots(HandTrans.position + transform.rotation * HorizontalHandOffset,
+                    transform.right*Input.GetAxis("Horizontal") - transform.up/3.5f, ClimbRange/2, CheckingSort.nomal);
 
                 if(currentSort != Climbingsort.ClimbingTowardsPoint)
-                    CheckForSpots(HandTrans.position + transform.rotation * HorizontalHandOffset, transform.right * Input.GetAxis("Horizontal") - transform.up / 1.5f, ClimbRange / 3, CheckingSort.nomal);
+                    CheckForSpots(HandTrans.position + transform.rotation * HorizontalHandOffset, 
+                        transform.right * Input.GetAxis("Horizontal") - transform.up / 1.5f, ClimbRange / 3, CheckingSort.nomal);
 
                 if (currentSort != Climbingsort.ClimbingTowardsPoint)
-                    CheckForSpots(HandTrans.position + transform.rotation * HorizontalHandOffset, transform.right * Input.GetAxis("Horizontal") - transform.up / 6f, ClimbRange / 1.5f, CheckingSort.nomal);
+                    CheckForSpots(HandTrans.position + transform.rotation * HorizontalHandOffset, 
+                        transform.right * Input.GetAxis("Horizontal") - transform.up / 6f, ClimbRange / 1.5f, CheckingSort.nomal);
 
                 if(currentSort != Climbingsort.ClimbingTowardsPoint)
                 {
                     int hor = 0;
                     if(Input.GetAxis("Horizontal") < 0)
-                        hor = 1;
+                        hor = -1;
                     if (Input.GetAxis("Horizontal") > 0)
                         hor = 1;
 
-                    CheckForSpots(HandTrans.position + transform.rotation * HorizontalHandOffset + transform.right*hor*SmallestEdge/4, transform.forward - transform.up*2, ClimbRange/3f, CheckingSort.turning);
-
+                    CheckForSpots(HandTrans.position + transform.rotation * HorizontalHandOffset + transform.right*hor*SmallestEdge/4, 
+                        transform.forward - transform.up*2, ClimbRange/3f, CheckingSort.turning);
                     if (currentSort != Climbingsort.ClimbingTowardsPoint)
-                        CheckForSpots(HandTrans.position + transform.rotation * HorizontalHandOffset + transform.right * 0.2f, transform.forward - transform.up * 2 + transform.right * hor/1.5f, ClimbRange / 3, CheckingSort.turning);
+                        CheckForSpots(HandTrans.position + transform.rotation * HorizontalHandOffset + transform.right * 0.2f, 
+                            transform.forward - transform.up * 2 + transform.right * hor/1.5f, ClimbRange / 3, CheckingSort.turning);
                 }
             }
         }
     }
 
     /// <summary>
-    /// 检测上升下落的时候的点(4个点,检测了一个矩形区域)
+    /// 检测上升下落的时候的攀爬点(4个点,检测了一个矩形区域) 
     /// </summary>
     /// <param name="Spotlocation">手抓取位置</param>
     /// <param name="dir">判断的方向(-transform.up)</param>
@@ -195,6 +217,7 @@ public class WallClimber : MonoBehaviour {
         bool foundspot = false;
         if(Physics.Raycast(Spotlocation - transform.right*SmallestEdge/2, dir, out hit, range, SpotLayer))
         {
+            Debug.Log("22");
             if(Vector3.Distance(HandTrans.position , hit.point) - SmallestEdge / 1.5f > minDistance)
             {
                 foundspot = true;
@@ -206,6 +229,7 @@ public class WallClimber : MonoBehaviour {
         {
             if (Physics.Raycast(Spotlocation + transform.right * SmallestEdge / 2, dir, out hit, range, SpotLayer))
             {
+                Debug.Log("22");
                 if (Vector3.Distance(HandTrans.position, hit.point) - SmallestEdge / 1.5f > minDistance)
                 {
                     foundspot = true;
@@ -218,6 +242,7 @@ public class WallClimber : MonoBehaviour {
         {
             if (Physics.Raycast(Spotlocation + transform.right * SmallestEdge / 2 + transform.forward*SmallestEdge, dir, out hit, range, SpotLayer))
             {
+                Debug.Log("22");
                 if (Vector3.Distance(HandTrans.position, hit.point) > minDistance)
                 {
                     foundspot = true;
@@ -230,6 +255,7 @@ public class WallClimber : MonoBehaviour {
         {
             if (Physics.Raycast(Spotlocation - transform.right * SmallestEdge / 2 + transform.forward * SmallestEdge, dir, out hit, range, SpotLayer))
             {
+                Debug.Log("22");
                 if (Vector3.Distance(HandTrans.position, hit.point) > minDistance)
                 {
                     foundspot = true;
@@ -240,7 +266,7 @@ public class WallClimber : MonoBehaviour {
     }
 
     /// <summary>
-    /// 查找墙边点
+    /// 查找墙边点 改变状态
     /// </summary>
     /// <param name="h">所使用检测到的射线</param>
     /// <param name="sort">当前的状态</param>
@@ -302,11 +328,11 @@ public class WallClimber : MonoBehaviour {
         {
             curray.point = hit2.point;
             curray.nomal = hit2.normal;
-            Debug.Log("curray.point = " + curray.point);
-            Debug.Log("hit obj = " + hit2.transform.name);
+            //Debug.Log("curray.point = " + curray.point);
+            //Debug.Log("hit obj = " + hit2.transform.name);
             //攀爬时手
-            Debug.DrawLine(HandTrans.position + transform.rotation * new Vector3(0, 0.05f, -0.05f),curray.point + new Vector3(0, 0.5f, 0), Color.blue);
-            Debug.Log("HandTrans.position + transform.rotation * new Vector3(0, 0.05f, -0.05f) = " + (HandTrans.position + transform.rotation * new Vector3(0, 0.05f, -0.05f)));
+            //Debug.DrawLine(HandTrans.position + transform.rotation * new Vector3(0, 0.05f, -0.05f),curray.point + new Vector3(0, 0.5f, 0), Color.blue);
+            //Debug.Log("HandTrans.position + transform.rotation * new Vector3(0, 0.05f, -0.05f) = " + (HandTrans.position + transform.rotation * new Vector3(0, 0.05f, -0.05f)));
             //Debug.LogError("寻找最近的攀爬点");
             //if(!Physics.Raycast(HandTrans.position + transform.rotation*new Vector3(0,0.05f,-0.05f), 
             //从手部抓取位置 到 墙壁点往上0.5f检测上面是否还有可以爬的地方.(以便跳到极限距离位置)
@@ -366,11 +392,13 @@ public class WallClimber : MonoBehaviour {
         float distance = Vector3.Distance(transform.position, (TargetPoint - transform.rotation * HandTrans.localPosition));
         //跳跃动画程度控制
         float percent = -9 * (BeginDistance - distance) / BeginDistance;
+        Debug.Log("percent = " + percent);
 
         animator.SetFloat("Jump", percent);
+        
 
         //阈值.爬到了
-        if(distance <= 0.01f && currentSort == Climbingsort.ClimbingTowardsPoint)
+        if (distance <= 0.01f && currentSort == Climbingsort.ClimbingTowardsPoint)
         {
             transform.position = TargetPoint - transform.rotation * HandTrans.localPosition;
             transform.rotation = lookrotation;
@@ -379,7 +407,7 @@ public class WallClimber : MonoBehaviour {
             currentSort = Climbingsort.Climbing;
         }
 
-        //
+        //往上爬平台.快到的时候,就直接切换为Walking
         if(distance <= 0.25f &&  currentSort == Climbingsort.ClimbingTowardPlateau)
         {
             transform.position = TargetPoint - transform.rotation * HandTrans.localPosition;
@@ -388,7 +416,11 @@ public class WallClimber : MonoBehaviour {
 
             lasttime = Time.time;
             currentSort = Climbingsort.Walking;
+
+            rigid.isKinematic = false;
+            TPUC.enabled = true;
         }
+        
     }
 
     //检查是否可以爬墙,查找可以爬的点
@@ -400,7 +432,7 @@ public class WallClimber : MonoBehaviour {
         //Debug.DrawRay(transform.position + transform.rotation * raycastPosition, dir, Color.yellow);
         //Debug.Log("CheckForClimbStart");
         //Debug.LogError("CheckForClimbStart");
-        if(Physics.Raycast(transform.position + transform.rotation*raycastPosition, dir, 1.6f) && !Input.GetButton("Jump"))
+        if(!Physics.Raycast(transform.position + transform.rotation*raycastPosition, dir, 1.6f) && !Input.GetButton("Jump"))
         {
             currentSort = Climbingsort.checkingForClimbStart;
             //从玩家身上往下发射射线寻找点.因为是从跳跃开始,在落下过程中寻找攀爬点.所以是从人身体胸部左右位置往下发射射线
@@ -412,42 +444,75 @@ public class WallClimber : MonoBehaviour {
     }
 
     /// <summary>
-    /// 
+    /// 检测是否可站立的平台
     /// </summary>
     public void CheckForPlateau()
     {
+        //Debug.Log("CheckForPlateau");
         RaycastHit hit2;
 
-        Vector3 dir = transform.up + transform.forward / 2;
+        Vector3 dir = transform.up + transform.forward / 4;
 
+        //上前方没有障碍物了，说明上面是平台顶端
         if(!Physics.Raycast(HandTrans.position+transform.rotation*VerticalHandOffset,dir, out hit2, 1.5f, SpotLayer))
         {
             currentSort = Climbingsort.ClimbingTowardPlateau;
-            Debug.LogError("CheckForPlateau");
+            //Debug.LogError("CheckForPlateau");
+            //上方
             if (Physics.Raycast(HandTrans.position + dir * 1.5f, -Vector3.up, out hit2, 1.7f, SpotLayer))
-                TargetPoint = HandTrans.position + dir * 1.5f;
+            {
+                Debug.Log("这里有墙可以踩");
+                //TargetPoint = HandTrans.position + dir * 1.5f;
+                //TargetPoint - transform.rotation * HandTrans.localPosition
+                TargetPoint = hit2.point  + transform.rotation * HandTrans.localPosition + transform.up*0.5f;
+            }
             else
-                TargetPoint = HandTrans.position + dir * 1.5f + transform.rotation* new Vector3(0,-0.2f,0.25f);
-            TargetNormal = -transform.forward;
+            {
+                //这里没墙了,应该是抓到了树枝边上,准备跳吧
+                TargetPoint = HandTrans.position + dir * 1.5f + transform.rotation * new Vector3(0, -0.2f, 0.25f);
 
+            }
+            TargetNormal = -transform.forward;
+            Debug.DrawRay(HandTrans.position + dir * 1.5f, -Vector3.up*1.7f, Color.yellow);
+            Debug.Log("TargetPoint = " + TargetPoint);
+            //Debug.LogError("CheckForPlateau");
             animator.SetBool("Crouch", true);
             animator.SetBool("OnGround", true);
-
-
+            animator.SetBool("Climbing", false);
         }
     }
 
 
     [System.Serializable]
-
     public enum Climbingsort
     {
+        /// <summary>
+        /// 站立状态
+        /// </summary>
         Walking,
+        /// <summary>
+        /// 跳起状态
+        /// </summary>
         Jumping,
+        /// <summary>
+        /// 下落状态
+        /// </summary>
         Falling,
+        /// <summary>
+        /// 攀附状态
+        /// </summary>
         Climbing,
+        /// <summary>
+        /// 攀爬ing状态
+        /// </summary>
         ClimbingTowardsPoint,
+        /// <summary>
+        /// 爬向平台
+        /// </summary>
         ClimbingTowardPlateau,
+        /// <summary>
+        /// 墙边操作,检测是否开始爬墙
+        /// </summary>
         checkingForClimbStart
     }
 

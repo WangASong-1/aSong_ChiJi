@@ -11,6 +11,9 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 		[SerializeField] float m_StationaryTurnSpeed = 180;
 		[SerializeField] float m_JumpPower = 12f;
 		[Range(1f, 4f)][SerializeField] float m_GravityMultiplier = 2f;
+        /// <summary>
+        /// 左右脚交换跳跃,需要统一动画出脚顺序
+        /// </summary>
 		[SerializeField] float m_RunCycleLegOffset = 0.2f; //specific to the character in sample assets, will need to be modified to work with others
 		[SerializeField] float m_MoveSpeedMultiplier = 1f;
 		[SerializeField] float m_AnimSpeedMultiplier = 1f;
@@ -43,7 +46,12 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 			m_OrigGroundCheckDistance = m_GroundCheckDistance;
 		}
 
-
+        /// <summary>
+        /// 移动
+        /// </summary>
+        /// <param name="move">移动的向量</param>
+        /// <param name="crouch">蹲下按钮</param>
+        /// <param name="jump">跳跃按钮</param>
 		public void Move(Vector3 move, bool crouch, bool jump)
 		{
 
@@ -51,8 +59,10 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 			// turn amount and forward amount required to head in the desired
 			// direction.
 			if (move.magnitude > 1f) move.Normalize();
+            //转换为本地坐标.方便查找方向
 			move = transform.InverseTransformDirection(move);
 			CheckGroundStatus();
+            //方向投影到 指定法线所在的平面上,避免斜坡穿墙
 			move = Vector3.ProjectOnPlane(move, m_GroundNormal);
 			m_TurnAmount = Mathf.Atan2(move.x, move.z);
 			m_ForwardAmount = move.z;
@@ -60,6 +70,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 			ApplyExtraTurnRotation();
 
 			// control and velocity handling is different when grounded and airborne:
+            // 在地上是否跳起，不在地上就执行空中移动
 			if (m_IsGrounded)
 			{
 				HandleGroundedMovement(crouch, jump);
@@ -76,7 +87,10 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 			UpdateAnimator(move);
 		}
 
-
+        /// <summary>
+        /// 蹲下的时候Collider缩放
+        /// </summary>
+        /// <param name="crouch"></param>
 		void ScaleCapsuleForCrouching(bool crouch)
 		{
 			if (m_IsGrounded && crouch)
@@ -101,6 +115,9 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 			}
 		}
 
+        /// <summary>
+        /// 站立保护.避免在蹲着走进去的房间切换成站立姿态
+        /// </summary>
 		void PreventStandingInLowHeadroom()
 		{
 			// prevent standing up in crouch-only zones
@@ -115,7 +132,10 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 			}
 		}
 
-
+        /// <summary>
+        /// 动画更新
+        /// </summary>
+        /// <param name="move"></param>
 		void UpdateAnimator(Vector3 move)
 		{
 			// update the animator parameters
@@ -153,7 +173,9 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 			}
 		}
 
-
+        /// <summary>
+        /// 飞在空中时
+        /// </summary>
 		void HandleAirborneMovement()
 		{
 			// apply extra gravity from multiplier:
@@ -163,12 +185,17 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 			m_GroundCheckDistance = m_Rigidbody.velocity.y < 0 ? m_OrigGroundCheckDistance : 0.01f;
 		}
 
-
+        /// <summary>
+        /// 起跳执行.当前还是地面状态,然后跳跃键被按下
+        /// </summary>
+        /// <param name="crouch">是否蹲着</param>
+        /// <param name="jump">是否跳起</param>
 		void HandleGroundedMovement(bool crouch, bool jump)
 		{
 			// check whether conditions are right to allow a jump:
 			if (jump && !crouch && m_Animator.GetCurrentAnimatorStateInfo(0).IsName("Grounded"))
 			{
+                Debug.Log("HandleGroundedMovement");
 				// jump!
 				m_Rigidbody.velocity = new Vector3(m_Rigidbody.velocity.x, m_JumpPower, m_Rigidbody.velocity.z);
 				m_IsGrounded = false;
@@ -177,6 +204,11 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 			}
 		}
 
+        /// <summary>
+        /// 额外的旋转(除了动画里面旋转,这里也额外弄了一个,以便加速玩家旋转)
+        /// aSong: 正确的骨骼旋转方式是这样：
+        /// transform.rotation *= m_Animator.deltaRotation;
+        /// </summary>
 		void ApplyExtraTurnRotation()
 		{
 			// help the character turn faster (this is in addition to root rotation in the animation)
@@ -184,7 +216,9 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 			transform.Rotate(0, m_TurnAmount * turnSpeed * Time.deltaTime, 0);
 		}
 
-
+        /// <summary>
+        /// 玩家移动
+        /// </summary>
 		public void OnAnimatorMove()
 		{
 			// we implement this function to override the default root motion.
@@ -196,10 +230,14 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 				// we preserve the existing y part of the current velocity.
 				v.y = m_Rigidbody.velocity.y;
 				m_Rigidbody.velocity = v;
+                //aSong: 正确的骨骼旋转方式
+                //transform.rotation *= m_Animator.deltaRotation;
 			}
 		}
 
-
+        /// <summary>
+        /// 检测是否落地
+        /// </summary>
 		void CheckGroundStatus()
 		{
 			RaycastHit hitInfo;
