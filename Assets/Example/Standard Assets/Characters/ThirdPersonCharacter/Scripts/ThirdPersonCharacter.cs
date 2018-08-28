@@ -190,10 +190,11 @@ namespace UnityStandardAssets.Characters.ThirdPerson
         /// </summary>
         /// <param name="crouch">是否蹲着</param>
         /// <param name="jump">是否跳起</param>
-		void HandleGroundedMovement(bool crouch, bool jump)
+		public void HandleGroundedMovement(bool crouch, bool jump)
 		{
 			// check whether conditions are right to allow a jump:
-			if (jump && !crouch && m_Animator.GetCurrentAnimatorStateInfo(0).IsName("Grounded"))
+			//if (jump && !crouch && m_Animator.GetCurrentAnimatorStateInfo(0).IsName("Grounded"))
+            if (jump && !crouch )
 			{
                 Debug.Log("HandleGroundedMovement");
 				// jump!

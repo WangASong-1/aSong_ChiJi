@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityStandardAssets.Characters.ThirdPerson;
 
-public class WallClimber : MonoBehaviour {
+public class WallClimber_bak : MonoBehaviour {
     /// <summary>
     /// 爬动的速度
     /// </summary>
@@ -119,7 +119,7 @@ public class WallClimber : MonoBehaviour {
         if (currentSort == Climbingsort.Walking && (Input.GetAxis("Vertical") != 0 || Input.GetAxis("Horizontal") != 0))
             CheckForClimbStart();
 
-        if(!TPC.m_IsGrounded && (currentSort == Climbingsort.Climbing))
+        if(!TPC.m_IsGrounded && (currentSort == Climbingsort.Climbing || currentSort == Climbingsort.ClimbingTowardPlateau || currentSort == Climbingsort.ClimbingTowardsPoint))
         {
             animator.SetBool("Climbing", true);
         }
@@ -193,14 +193,6 @@ public class WallClimber : MonoBehaviour {
                 //当没有检测到上面有障碍物,就爬平台
                 if (currentSort != Climbingsort.ClimbingTowardsPoint)
                     CheckForPlateau();
-                else
-                {
-                    rigid.isKinematic = false;
-                    
-                    animator.SetBool("Climbing", false);
-                    TPC.HandleGroundedMovement(false, true);
-                    lasttime = Time.time;
-                }
             }
 
             if (Input.GetAxis("Vertical") < 0)
@@ -422,34 +414,25 @@ public class WallClimber : MonoBehaviour {
     /// </summary>
     public void MoveTowardsPoint()
     {
-        float distance = Vector3.Distance(transform.position, (TargetPoint - transform.rotation * HandTrans.localPosition));
-
-        if (distance < 0.5f)
-        {
-            Debug.Log("MoveTowardsPoint11111");
-            //爬动
-            transform.position = Vector3.Lerp(transform.position, (TargetPoint - transform.rotation * HandTrans.localPosition), Time.deltaTime * ClimbForce);
-            rigid.isKinematic = true;
-        }
-       
+        //爬动
+        transform.position = Vector3.Lerp(transform.position, (TargetPoint - transform.rotation * HandTrans.localPosition), Time.deltaTime * ClimbForce);
         //面朝向点法线相反的方向(因为可能是斜坡.)
         Quaternion lookrotation = Quaternion.LookRotation(-TargetNormal);
         transform.rotation = Quaternion.Slerp(transform.rotation, lookrotation, Time.deltaTime * ClimbForce);
 
         animator.SetBool("OnGround", false);
 
-
-        
+        float distance = Vector3.Distance(transform.position, (TargetPoint - transform.rotation * HandTrans.localPosition));
         //跳跃动画程度控制
         float percent = -9 * (BeginDistance - distance) / BeginDistance;
         //Debug.Log("percent = " + percent);
 
         animator.SetFloat("Jump", percent);
+        
 
         //阈值.爬到了
-        if (distance <= 0.1f && currentSort == Climbingsort.ClimbingTowardsPoint)
+        if (distance <= 0.01f && currentSort == Climbingsort.ClimbingTowardsPoint)
         {
-            Debug.Log("MoveTowardsPoint22222");
             transform.position = TargetPoint - transform.rotation * HandTrans.localPosition;
             transform.rotation = lookrotation;
 
@@ -460,7 +443,6 @@ public class WallClimber : MonoBehaviour {
         //往上爬平台.快到的时候,就直接切换为Walking
         if(distance <= 0.25f &&  currentSort == Climbingsort.ClimbingTowardPlateau)
         {
-            Debug.Log("MoveTowardsPoint33333");
             transform.position = TargetPoint - transform.rotation * HandTrans.localPosition;
 
             transform.rotation = lookrotation;
@@ -469,7 +451,6 @@ public class WallClimber : MonoBehaviour {
             currentSort = Climbingsort.Walking;
 
             rigid.isKinematic = false;
-            rigid.useGravity = true;
             TPUC.enabled = true;
         }
         
