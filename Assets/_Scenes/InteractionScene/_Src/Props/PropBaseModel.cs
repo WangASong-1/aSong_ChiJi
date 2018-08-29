@@ -65,4 +65,9 @@ public class PropBaseModel : MonoBehaviour {
             mInteractionTriggers[i].gameObject.SetActive(true);
         }
     }
+
+    public void Using()
+    {
+        Debug.Log("开枪突突突");
+    }
 }

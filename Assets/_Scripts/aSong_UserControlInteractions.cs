@@ -34,48 +34,6 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
 
     protected override void Update()
     {
-        if (Input.GetKey(KeyCode.R))
-        {
-            animator.SetLayerWeight(1, 0);
-            //InteractionObject obj = interactionSystem.GetInteractionObject(FullBodyBipedEffector.RightHand);
-            interactionSystem.StopInteraction(FullBodyBipedEffector.RightHand);
-            interactionSystem.StopInteraction(FullBodyBipedEffector.LeftHand);
-            if (obj != null)
-            {
-                obj.targetsRoot.parent = weaponPoint[0];
-                obj.targetsRoot.localPosition = Vector3.zero;
-                obj.targetsRoot.localEulerAngles = Vector3.zero;
-
-            }
-            var poser = animator.GetBoneTransform(HumanBodyBones.RightHand).GetComponent<Poser>();
-            if (poser != null)
-            {
-                poser.poseRoot = null;
-                poser.weight = 0f;
-            }
-            poser = animator.GetBoneTransform(HumanBodyBones.LeftHand).GetComponent<Poser>();
-            if (poser != null)
-            {
-                poser.poseRoot = null;
-                poser.weight = 0f;
-            }
-        }
-
-        if (Input.GetKey(KeyCode.T))
-        {
-            //InteractionObject obj = interactionSystem.GetInteractionObject(FullBodyBipedEffector.RightHand);
-            
-          
-            if (obj != null)
-            {
-                interactionSystem.StartInteraction(FullBodyBipedEffector.RightHand, obj, false);
-                interactionSystem.StartInteraction(FullBodyBipedEffector.LeftHand, obj, false);
-                animator.SetLayerWeight(1, 1);
-
-            }
-
-
-        }
         // Disable input when in interaction
         if (disableInputInInteraction && interactionSystem != null && (interactionSystem.inInteraction || interactionSystem.IsPaused()))
         {
@@ -96,57 +54,18 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
         base.Update();
 
         
+        //开枪
+        MakeFire();
     }
 
-
-    public InteractionObject obj;
-    // Triggering the interactions
-    void OnGUI()
+    void MakeFire()
     {
-        // If jumping or falling, do nothing
-        if (!character.onGround) return;
-
-        // If an interaction is paused, resume on user input
-        if (interactionSystem.IsPaused() && interactionSystem.IsInSync())
+        if (Input.GetMouseButtonDown(0) && currentProp)
         {
-            GUILayout.Label("Press E to resume interaction");
-
-            if (Input.GetKey(KeyCode.E))
-            {
-                interactionSystem.ResumeAll();
-            }
-
-            return;
+            currentProp.Using();
         }
-
-        // If not paused, find the closest InteractionTrigger that the character is in contact with
-        int closestTriggerIndex = interactionSystem.GetClosestTriggerIndex();
-
-        InteractionObject[] objs = interactionSystem.GetClosestInteractionObjectsInRange();
-        //objs 有一个 model,保存他的 图片,然后将图片获取 放到 control 上 显示到 view(滑条)中,并添加点击事件，点击后拾取,出范围后 remove view中按钮
-        for(int i = 0; i < objs.Length; i++)
-        {
-            //aSongUI_Controller.Instance.AddProp(objs[i].GetComponentInParent<PropBaseModel>().prop) ;
-        }
-
-        // ...if none found, do nothing
-        if (closestTriggerIndex == -1) return;
-
-        // ...if the effectors associated with the trigger are in interaction, do nothing
-        if (!interactionSystem.TriggerEffectorsReady(closestTriggerIndex)) return;
-
-        // Its OK now to start the trigger
-        GUILayout.Label("Press E to start interaction");
-
-        if (Input.GetKey(KeyCode.E))
-        {
-            interactionSystem.TriggerInteraction(closestTriggerIndex, false);
-            animator.SetLayerWeight(1, 1);
-            obj = interactionSystem.GetInteractionObject(FullBodyBipedEffector.RightHand);
-            obj.targetsRoot.GetComponentInChildren<InteractionTrigger>().enabled = false;
-        }
-       
     }
+
 
     //控制器只负责手上的道具,手上有道具时该丢的丢该放背包的放背包
     void PutCurrentInBag()
@@ -187,7 +106,7 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
 
         bool b_IsBagFull = false;
         bool b_needGrab = true;
-        currentProp = current;
+        currentProp = model;
         if (b_propFromBag)
         {
             //从背包里拿出来的道具,那么直接将手上的道具放背包去
@@ -197,7 +116,7 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
                 PutCurrentInBag();
                 b_needGrab = true;
             }
-            //这个是
+            //这个是要拿的东西为空,说明只是打算把手上的道具收回背包，直接返回
             if (model == null)
             {
                 return true;
