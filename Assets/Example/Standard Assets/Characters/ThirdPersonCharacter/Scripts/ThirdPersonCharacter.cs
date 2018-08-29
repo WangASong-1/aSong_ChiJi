@@ -55,9 +55,6 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 		public void Move(Vector3 move, bool crouch, bool jump)
 		{
 
-			// convert the world relative moveInput vector into a local-relative
-			// turn amount and forward amount required to head in the desired
-			// direction.
 			if (move.magnitude > 1f) move.Normalize();
             //转换为本地坐标.方便查找方向
 			move = transform.InverseTransformDirection(move);
@@ -69,7 +66,6 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 
 			ApplyExtraTurnRotation();
 
-			// control and velocity handling is different when grounded and airborne:
             // 在地上是否跳起，不在地上就执行空中移动
 			if (m_IsGrounded)
 			{
@@ -83,7 +79,6 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 			ScaleCapsuleForCrouching(crouch);
 			PreventStandingInLowHeadroom();
 
-			// send input and other state parameters to the animator
 			UpdateAnimator(move);
 		}
 
@@ -120,7 +115,6 @@ namespace UnityStandardAssets.Characters.ThirdPerson
         /// </summary>
 		void PreventStandingInLowHeadroom()
 		{
-			// prevent standing up in crouch-only zones
 			if (!m_Crouching)
 			{
 				Ray crouchRay = new Ray(m_Rigidbody.position + Vector3.up * m_Capsule.radius * k_Half, Vector3.up);
@@ -138,7 +132,6 @@ namespace UnityStandardAssets.Characters.ThirdPerson
         /// <param name="move"></param>
 		void UpdateAnimator(Vector3 move)
 		{
-			// update the animator parameters
 			m_Animator.SetFloat("Forward", m_ForwardAmount, 0.1f, Time.deltaTime);
 			m_Animator.SetFloat("Turn", m_TurnAmount, 0.1f, Time.deltaTime);
 			m_Animator.SetBool("Crouch", m_Crouching);
@@ -148,9 +141,6 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 				m_Animator.SetFloat("Jump", m_Rigidbody.velocity.y);
 			}
 
-			// calculate which leg is behind, so as to leave that leg trailing in the jump animation
-			// (This code is reliant on the specific run cycle offset in our animations,
-			// and assumes one leg passes the other at the normalized clip times of 0.0 and 0.5)
 			float runCycle =
 				Mathf.Repeat(
 					m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime + m_RunCycleLegOffset, 1);
@@ -160,15 +150,12 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 				m_Animator.SetFloat("JumpLeg", jumpLeg);
 			}
 
-			// the anim speed multiplier allows the overall speed of walking/running to be tweaked in the inspector,
-			// which affects the movement speed because of the root motion.
 			if (m_IsGrounded && move.magnitude > 0)
 			{
 				m_Animator.speed = m_AnimSpeedMultiplier;
 			}
 			else
 			{
-				// don't use that while airborne
 				m_Animator.speed = 1;
 			}
 		}
@@ -178,7 +165,6 @@ namespace UnityStandardAssets.Characters.ThirdPerson
         /// </summary>
 		void HandleAirborneMovement()
 		{
-			// apply extra gravity from multiplier:
 			Vector3 extraGravityForce = (Physics.gravity * m_GravityMultiplier) - Physics.gravity;
 			m_Rigidbody.AddForce(extraGravityForce);
 
@@ -192,7 +178,6 @@ namespace UnityStandardAssets.Characters.ThirdPerson
         /// <param name="jump">是否跳起</param>
 		public void HandleGroundedMovement(bool crouch, bool jump)
 		{
-			// check whether conditions are right to allow a jump:
 			//if (jump && !crouch && m_Animator.GetCurrentAnimatorStateInfo(0).IsName("Grounded"))
             if (jump && !crouch )
 			{

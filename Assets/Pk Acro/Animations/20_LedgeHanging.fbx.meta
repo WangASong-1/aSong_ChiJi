@@ -142,6 +142,7 @@ ModelImporter:
     7400012: DropDown_Start
     7400014: DropDown_Finish
     7400016: DropDown_Reverse_Finish
+    7400018: ClimbUp
     9500000: //RootNode
   materials:
     importMaterials: 0
@@ -294,7 +295,7 @@ ModelImporter:
       loopBlend: 0
       loopBlendOrientation: 1
       loopBlendPositionY: 0
-      loopBlendPositionXZ: 1
+      loopBlendPositionXZ: 0
       keepOriginalOrientation: 0
       keepOriginalPositionY: 0
       keepOriginalPositionXZ: 0

@@ -138,6 +138,7 @@ ModelImporter:
     7400004: MD_3M
     7400006: MD_4M
     7400008: MD_5M
+    7400010: DropDown
     9500000: //RootNode
   materials:
     importMaterials: 0
@@ -150,7 +151,10 @@ ModelImporter:
     optimizeGameObjects: 0
     motionNodeName: 
     animationImportErrors: 
-    animationImportWarnings: 
+    animationImportWarnings: "\nClip 'Take 001' has import animation warnings that
+      might lower retargeting quality:\nNote: Activate translation DOF on avatar to
+      improve retargeting quality.\n\t'ANIM_Character_Spine03' is inbetween humanoid
+      transforms and has rotation animation that will be discarded.\n"
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
     animationCompression: 1

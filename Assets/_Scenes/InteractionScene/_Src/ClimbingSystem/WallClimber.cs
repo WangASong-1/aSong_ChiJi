@@ -60,6 +60,8 @@ public class WallClimber : MonoBehaviour {
     private float BeginDistance;
     private RaycastHit hit;
     private Quaternion oldRotation;
+
+    private bool b_HorizontalMove = false;
 	
     void Update()
     {
@@ -106,6 +108,7 @@ public class WallClimber : MonoBehaviour {
         //若没在走路状态,然后又落在地上,并且不是爬墙状态.那么变走路状态,并启动移动按钮
         if(currentSort != Climbingsort.Walking && TPC.m_IsGrounded && currentSort != Climbingsort.ClimbingTowardsPoint)
         {
+            Debug.Log("UpdateStats::在地上");
             currentSort = Climbingsort.Walking;
             TPUC.enabled = true;
             rigid.isKinematic = false;
@@ -123,7 +126,7 @@ public class WallClimber : MonoBehaviour {
         {
             animator.SetBool("Climbing", true);
         }
-        else
+        else if(TPC.m_IsGrounded )
         {
             animator.SetBool("Climbing", false);
             animator.SetBool("ClimbUp", false);
@@ -184,43 +187,58 @@ public class WallClimber : MonoBehaviour {
     {
         if(Time.time - lasttime > CoolDown && currentSort == Climbingsort.Climbing)
         {
+            b_HorizontalMove = false;
             //上下爬动检测
-            if(Input.GetAxis("Vertical") > 0)
+            if (Input.GetAxis("Vertical") > 0)
             {
                 //Debug.LogError(12);
                 CheckForSpots(HandTrans.position + transform.rotation * VerticalHandOffset + transform.up * ClimbRange * 0.5f, -transform.up, ClimbRange * 0.5f, CheckingSort.nomal);
 
-                //当没有检测到上面有障碍物,就爬平台
+                //当没有检测到上面有障碍物,就检测平台平台
                 if (currentSort != Climbingsort.ClimbingTowardsPoint)
                     CheckForPlateau();
                 else
                 {
+                    //跳跃方式爬上去
                     rigid.isKinematic = false;
                     
                     animator.SetBool("Climbing", false);
                     TPC.HandleGroundedMovement(false, true);
                     lasttime = Time.time;
                 }
+                return;
             }
 
             if (Input.GetAxis("Vertical") < 0)
             {
                 CheckForSpots(HandTrans.position - transform.rotation * (VerticalHandOffset + new Vector3(0,0.3f,0)) , -transform.up, ClimbRange, CheckingSort.nomal);
                 
+                //下墙
                 if(currentSort != Climbingsort.ClimbingTowardsPoint)
                 {
+                    Debug.Log("Climb::下墙");
+                    animator.SetBool("ClimbDown", true);
                     rigid.isKinematic = false;
                     TPUC.enabled = true;
                     currentSort = Climbingsort.Falling;
                     oldRotation = transform.rotation;
-
-                    animator.SetBool("ClimbDown", true);
                 }
+                else
+                {
+                    //往下面爬
+                    rigid.isKinematic = false;
+
+                    animator.SetBool("Climbing", false);
+                    //TPC.HandleGroundedMovement(false, true);
+                    lasttime = Time.time;
+                }
+                return;
             }
 
             //左右爬动检测
             if (Input.GetAxis("Horizontal") != 0)
             {
+                b_HorizontalMove = true;
                 CheckForSpots(HandTrans.position + transform.rotation * HorizontalHandOffset,
                     transform.right*Input.GetAxis("Horizontal") - transform.up/3.5f, ClimbRange/2, CheckingSort.nomal);
 
@@ -250,6 +268,8 @@ public class WallClimber : MonoBehaviour {
         }
     }
 
+
+    #region 检测上升下落的时候的攀爬点(4个点,检测了一个矩形区域) 
     /// <summary>
     /// 检测上升下落的时候的攀爬点(4个点,检测了一个矩形区域) 
     /// </summary>
@@ -305,12 +325,14 @@ public class WallClimber : MonoBehaviour {
             }
         }
     }
+    #endregion
 
     /// <summary>
     /// 查找墙边点 改变状态
     /// </summary>
     /// <param name="h">所使用检测到的射线</param>
     /// <param name="sort">当前的状态</param>
+    #region
     public void FindSpot(RaycastHit h, CheckingSort sort)
     {
         //若是该攀爬点跟世界的角度过大(过于倾斜),则不能抓
@@ -335,16 +357,21 @@ public class WallClimber : MonoBehaviour {
                 if(currentSort != Climbingsort.Climbing && currentSort != Climbingsort.ClimbingTowardsPoint)
                 {
                     //爬向最近的spot.爬动时人物控制取消,刚体取消,不在地上
-                    TPUC.enabled = false;
+                    Debug.Log("FindSpot::找到要爬的点了 TargetPoint = " + TargetPoint);
                     rigid.isKinematic = true;
+                    TPUC.enabled = false;
                     TPC.m_IsGrounded = false;
                 }
                 currentSort = Climbingsort.ClimbingTowardsPoint;
                 BeginDistance = Vector3.Distance(transform.position, (TargetPoint - transform.rotation * HandTrans.localPosition));
+                    
             }
         }
     }
+    #endregion
 
+
+    #region 获取最近的一个攀爬点
     /// <summary>
     /// 获取最近的一个攀爬点
     /// </summary>
@@ -416,6 +443,7 @@ public class WallClimber : MonoBehaviour {
             return curray;
         }
     }
+    #endregion
 
     /// <summary>
     /// 爬向寻找好的spot
@@ -424,9 +452,9 @@ public class WallClimber : MonoBehaviour {
     {
         float distance = Vector3.Distance(transform.position, (TargetPoint - transform.rotation * HandTrans.localPosition));
 
-        if (distance < 0.5f)
+        if (distance < 0.5f || b_HorizontalMove || currentSort == Climbingsort.ClimbingTowardPlateau)
         {
-            Debug.Log("MoveTowardsPoint11111");
+            Debug.Log("MoveTowardsPoint::进入阈值了,直接吸附到指定点");
             //爬动
             transform.position = Vector3.Lerp(transform.position, (TargetPoint - transform.rotation * HandTrans.localPosition), Time.deltaTime * ClimbForce);
             rigid.isKinematic = true;
@@ -449,7 +477,8 @@ public class WallClimber : MonoBehaviour {
         //阈值.爬到了
         if (distance <= 0.1f && currentSort == Climbingsort.ClimbingTowardsPoint)
         {
-            Debug.Log("MoveTowardsPoint22222");
+            Debug.Log("MoveTowardsPoint::结束阈值,爬向点");
+            b_HorizontalMove = false;
             transform.position = TargetPoint - transform.rotation * HandTrans.localPosition;
             transform.rotation = lookrotation;
 
@@ -460,7 +489,7 @@ public class WallClimber : MonoBehaviour {
         //往上爬平台.快到的时候,就直接切换为Walking
         if(distance <= 0.25f &&  currentSort == Climbingsort.ClimbingTowardPlateau)
         {
-            Debug.Log("MoveTowardsPoint33333");
+            Debug.Log("MoveTowardsPoint::结束阈值,爬向平台");
             transform.position = TargetPoint - transform.rotation * HandTrans.localPosition;
 
             transform.rotation = lookrotation;
@@ -472,10 +501,9 @@ public class WallClimber : MonoBehaviour {
             rigid.useGravity = true;
             TPUC.enabled = true;
         }
-        
     }
 
-    //检查是否可以爬墙,查找可以爬的点
+    #region 检查是否可以爬墙,查找可以爬的点
     public void CheckForClimbStart()
     {
         RaycastHit hit2;
@@ -484,7 +512,7 @@ public class WallClimber : MonoBehaviour {
         //Debug.DrawRay(transform.position + transform.rotation * raycastPosition, dir, Color.yellow);
         //Debug.Log("CheckForClimbStart");
         //Debug.LogError("CheckForClimbStart");
-        if(!Physics.Raycast(transform.position + transform.rotation*raycastPosition, dir, 1.6f) && !Input.GetButton("Jump"))
+        if (!Physics.Raycast(transform.position + transform.rotation * raycastPosition, dir, 1.6f) && !Input.GetButton("Jump"))
         {
             currentSort = Climbingsort.checkingForClimbStart;
             //从玩家身上往下发射射线寻找点.因为是从跳跃开始,在落下过程中寻找攀爬点.所以是从人身体胸部左右位置往下发射射线
@@ -494,7 +522,10 @@ public class WallClimber : MonoBehaviour {
                 FindSpot(hit2, CheckingSort.falling);
         }
     }
+    #endregion
 
+
+    #region 检测是否可站立的平台
     /// <summary>
     /// 检测是否可站立的平台
     /// </summary>
@@ -534,6 +565,7 @@ public class WallClimber : MonoBehaviour {
             animator.SetBool("OnGround", true);
         }
     }
+    #endregion
 
 
     [System.Serializable]
@@ -566,7 +598,7 @@ public class WallClimber : MonoBehaviour {
         /// <summary>
         /// 墙边操作,检测是否开始爬墙
         /// </summary>
-        checkingForClimbStart
+        checkingForClimbStart,
     }
 
     [System.Serializable]
