@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 消息系统,发送消息给注册了的节点
+/// </summary>
 public class EventNode : MonoBehaviour {
 
     /// <summary>

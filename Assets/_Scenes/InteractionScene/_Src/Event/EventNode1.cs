@@ -17,7 +17,7 @@ public class EventNode1 : EventNode
         mInstance = this;
 
         //base.EventNodePriority = 30;
-
+        //EventNodeCore.Instance?.AttachEventNode(this);
         if (EventNodeCore.Instance)
         {
             EventNodeCore.Instance.AttachEventNode(this);
