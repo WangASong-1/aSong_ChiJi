@@ -109,7 +109,7 @@ namespace TinyTeam.UI {
          GameObject eventObj = new GameObject("EventSystem");
          eventObj.layer = LayerMask.NameToLayer("UI");
          eventObj.transform.SetParent(go.transform);
-         eventObj.AddComponent<EventSystem>();
+         eventObj.AddComponent<EventSystem>().sendNavigationEvents = false;
          eventObj.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
 
       }

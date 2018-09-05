@@ -14,6 +14,12 @@ public class test : MonoBehaviour {
 
     private Hashtable mHash = new Hashtable();
 
+    private Action<int> mAction;
+    private Action<int, string> mActionStr;
+
+    private Func<int,int> mFunc;
+
+    private List<int> mList;
 
     void Start()
     {
@@ -32,6 +38,37 @@ public class test : MonoBehaviour {
         mDic_int.Add(5, 5);
 
         mHash.Add(1, 1);
+
+        mAction = x => Debug.Log("111 + " + x);
+        mAction(22222);
+        mFunc = x => x*x;
+        Debug.Log(mFunc(3)) ;
+
+        string str = "Hello aSong111";
+        mActionStr = (int x, string s) => {
+            if (s.Length > str.Length)
+                Debug.Log("字符串长 = " + s);
+            else
+                Debug.Log("字符串短 = " + str);
+                                           };
+        mActionStr(3, "hello World");
+        Debug.Log(mFunc(3));
+
+
+        //---------- 集合 ---------------------
+        mList = new List<int> { 1, 3, 5, 7, 9 };
+        mList.ForEach(item => Debug.Log(item));
+
+        //Dictionary<int, string> mdic = new Dictionary<int, string> { { 1, "123"}, { 2, "456"}  };
+
+        if (str.IsNumber())
+        {
+            Debug.Log("2222222222");
+        }
+        if (str.IsNumber(123))
+        {
+            Debug.Log("1111111111");
+        }
     }
 
     void DelegateAAA()
@@ -65,6 +102,8 @@ public class test : MonoBehaviour {
 
     private void Update()
     {
+        return;
+        mActionStr(3, "hello World");
         DelegateAAA();
 
         UnityEngine.Object o;

@@ -24,7 +24,8 @@ public class aSongUI_Main : TTUIPage
         playerWeapons_2 = transform.Find("PlayerWeapon_2/Weapon").gameObject;
 
         playerWeapons.AddComponent<aSongUI_PropListItem>();
-        playerWeapons.GetComponent<Button>().onClick.AddListener(aSongUI_Controller.Instance.OnClickSkillItem);
+        Button btn = playerWeapons.GetComponent<Button>();
+        btn.onClick.AddListener(aSongUI_Controller.Instance.OnClickSkillItem);
 
         playerWeapons_2.AddComponent<aSongUI_PropListItem>();
         playerWeapons_2.GetComponent<Button>().onClick.AddListener(aSongUI_Controller.Instance.OnClickSkillItem);
