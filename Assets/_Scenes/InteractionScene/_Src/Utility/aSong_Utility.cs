@@ -21,7 +21,7 @@ public class aSong_Utility  {
     public const float RifleTriggerHapticPulseTime = 0.3f;
 
     //yield静态保存
-    #region
+    #region yield静态保存
     private static List<Vector3> allWayPoints = new List<Vector3> ();
 
     static Dictionary<float, WaitForSeconds> _timeInterval = new Dictionary<float, WaitForSeconds>(100);
@@ -48,7 +48,9 @@ public class aSong_Utility  {
     #endregion
 
 
+    #region 改变材质球的RenderMode
     //改变材质球的RenderMode
+
     public static void SetMaterialRenderingMode (Material material, RenderingMode renderingMode)
 	{
 		switch (renderingMode) {
@@ -90,9 +92,11 @@ public class aSong_Utility  {
 			break;
 		}
 	}
+    #endregion
 
-	//计算到目标点的距离,若不能到达，则计算的是两点之间的距离
-	public static float CalculatePathLength (Vector3 _position,Vector3 targetPosition, UnityEngine.AI.NavMeshAgent _nav,UnityEngine.AI.NavMeshPath _path)
+    #region 计算到目标点的距离,若不能到达，则计算的是两点之间的距离
+    //计算到目标点的距离,若不能到达，则计算的是两点之间的距离
+    public static float CalculatePathLength (Vector3 _position,Vector3 targetPosition, UnityEngine.AI.NavMeshAgent _nav,UnityEngine.AI.NavMeshPath _path)
 	{
 		_path.ClearCorners ();
 		allWayPoints.Clear ();
@@ -125,7 +129,9 @@ public class aSong_Utility  {
 		return pathLength;
 	}
 
-	public static void SetActiveSelf(GameObject obj, bool value){
+    #endregion
+
+    public static void SetActiveSelf(GameObject obj, bool value){
 		if (obj.activeSelf != value)
 			obj.SetActive (value);
 	}
