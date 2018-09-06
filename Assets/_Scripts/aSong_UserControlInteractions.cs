@@ -100,7 +100,7 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
     {
         if (interactionSystem.IsInInteraction(FullBodyBipedEffector.RightHand))
         {
-            Debug.LogError("我在动画中不方便拿东西");
+            //Debug.LogError("我在动画中不方便拿东西");
             return false;
         }
 
