@@ -5,7 +5,7 @@ using UnityEngine;
 //道具名. 
 public enum PropName
 {
-    pistol, M416, M67 ,AK47,M14,  other
+    pistol, M416, M67 ,AK47,M14, bullets_9mm,  other
 }
 
 //道具种类:射手步枪,冲锋枪,雷
