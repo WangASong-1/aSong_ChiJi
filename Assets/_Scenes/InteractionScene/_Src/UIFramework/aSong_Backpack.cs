@@ -12,6 +12,11 @@ public class aSong_Backpack : TTUIPage
         uiPath = "UIPrefab/Backpack";
     }
 
+    public override void Awake(GameObject go)
+    {
+        base.Awake(go);
+    }
+
     public override void Hide()
     {
         base.Hide();
