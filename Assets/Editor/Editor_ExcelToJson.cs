@@ -147,7 +147,7 @@ public class Editor_ExcelToJson : EditorWindow
         if (WindowDll.GetSaveFileName(wof))
         {
             Debug.Log("SaveFileWin = " + wof.file);
-            FileStream fileStream = new FileStream(wof.file, FileMode.OpenOrCreate);
+            FileStream fileStream = new FileStream(wof.file, FileMode.Create);
             byte[] bts = new UTF8Encoding().GetBytes(fileContent);
             fileStream.Write(bts, 0, bts.Length);
             fileStream.Close();

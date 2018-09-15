@@ -9,6 +9,7 @@ public class aSongUI_Main : TTUIPage
     public GameObject playerHPBar;
     public GameObject playerWeapons;
     public GameObject playerWeapons_2;
+    public GameObject backpackBtn;
 
 
     public aSongUI_Main() : base(UIType.Fixed, UIMode.DoNothing, UICollider.None)
@@ -29,6 +30,13 @@ public class aSongUI_Main : TTUIPage
 
         playerWeapons_2.AddComponent<aSongUI_PropListItem>();
         playerWeapons_2.GetComponent<Button>().onClick.AddListener(aSongUI_Controller.Instance.OnClickSkillItem);
+
+        backpackBtn = transform.Find("Backpack").gameObject;
+        btn = backpackBtn.GetComponent<Button>();
+        btn.onClick.AddListener(() =>
+        {
+            TTUIPage.ShowPage<aSong_Backpack>();
+        });
     }
 
     public override void Hide()
