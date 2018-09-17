@@ -5,7 +5,7 @@ using UnityEngine;
 //道具名. 
 public enum PropName
 {
-    pistol, M416, M67 ,AK47,M14, bullets_9mm,  other
+    M9, M416, M67 ,AK47,M14, bullets_9mm,  other
 }
 
 //道具种类:射手步枪,冲锋枪,雷
@@ -23,6 +23,7 @@ public class aSong_PlayerData {
         public PropType type;
         public PropName name;
         public float weight;
+        public int num;
         public static int idCount = 0;
         public Prop(PropName _name)
         {
@@ -32,7 +33,7 @@ public class aSong_PlayerData {
             pic = Resources.Load<Sprite>(_name.ToString());
             type = aSongUI_Controller.Instance.GetPropType(_name);
             weight = aSongUI_Controller.Instance.GetWeight(_name);
-
+            num = aSongUI_Controller.Instance.GetNum(_name);
         }
 
         private Prop() { }
@@ -88,39 +89,9 @@ public class aSong_PlayerData {
             case PropType.bomb:
                 bombs.Add(model);
                 break;
-            case PropType.rifle:
-                if(guns.Count >= 2)
-                {
-                    //若2个rifle格子满了
-                    if(currentModel.prop.type == PropType.rifle)
-                    {
-                        //手上拿的也是rifle,那么替换
-                        dic_bagProp.Remove(currentModel.prop.propID);
-                        for(int i = 0; i < guns.Count; i++)
-                        {
-                            if( guns[i] == currentModel)
-                            {
-                                guns[i] = model;
-                            }
-                        }
-                        currentModel = model;
-                    }
-                    else
-                    {
-                        //手上拿的不是rifle,那么扔掉第一个格子中的rifle
-                        dic_bagProp.Remove(guns[0].prop.propID);
-                        guns[0] = model;
-                    }
-
-                }
-                else
-                {
-                    //手上道具都没满,直接加入.不换枪
-                    guns.Add(model);
-                }
-                break;
             case PropType.pistol:
-                pistol = model;
+            case PropType.rifle:
+                PutWeaponInBackpack(model);
                 break;
             case PropType.other:
 
@@ -131,6 +102,79 @@ public class aSong_PlayerData {
 
         dic_bagProp.Add(model.prop.propID, model);
         return;
+    }
+
+    void PutWeaponInBackpack(PropBaseModel model)
+    {
+        if(currentModel)
+            Debug.Log("current = " + currentModel.name);
+        if(model)
+            Debug.Log("model = " + model.name);
+
+        if (guns.Count == 3)
+        {
+            //背包满一定是:2把rifle 一把pistol
+            //背包满的判断:丢掉手上的,加入新拿的
+            if (currentModel.prop.type == PropType.rifle || currentModel.prop.type == PropType.pistol)
+            {
+                //手上拿的也是rifle,那么替换
+                dic_bagProp.Remove(currentModel.prop.propID);
+                for (int i = 0; i < guns.Count; i++)
+                {
+                    if (guns[i] == currentModel)
+                    {
+                        guns[i] = model;
+                    }
+                }
+                currentModel = model;
+            }
+        }
+        else
+        {
+            Debug.Log("123321");
+            //背包不满的判断
+            int count = 0;
+            bool b_pisotl = false;
+            foreach (var item in guns)
+            {
+                if (item.prop.type == PropType.rifle)
+                    count++;
+                if (item.prop.type == PropType.pistol)
+                    b_pisotl = true;
+            }
+            if((model.prop.type == PropType.rifle && count==2) || (b_pisotl && model.prop.type == PropType.pistol))
+            {
+                Debug.Log("1233211111111");
+
+                //如果有手枪并且当前拿取的是手枪；或者当前拿取的是rifle并且背包2把rifle了,那么丢掉道具
+                if (currentModel.prop.type == model.prop.type)
+                {
+                    Debug.Log("1233222222222");
+
+                    //手上拿跟拾取的是同类型的
+                    dic_bagProp.Remove(currentModel.prop.propID);
+                    for (int i = 0; i < guns.Count; i++)
+                    {
+                        //寻找currentModel在guns中的位置
+                        if (guns[i] == currentModel)
+                        {
+                            guns[i] = model;
+                        }
+                    }
+                    currentModel = model;
+                }
+                else
+                {
+                    //手上拿的不是拾取类型的,那么直接移除然后加入新的
+                    dic_bagProp.Remove(guns[0].prop.propID);
+                    guns[0] = model;
+                }
+            }
+            else
+            {
+                guns.Add(model);
+            }
+        }
     }
 
     public void RemoveBagProp(PropBaseModel model)
@@ -168,7 +212,7 @@ public class aSong_PlayerData {
                     b_Discard = true;
                 break;
             case PropType.rifle:
-                if (GetGunNum() >= 2)
+                if (GetGunNum() >= 3)
                     b_Discard = true;
                 break;
             case PropType.bomb:

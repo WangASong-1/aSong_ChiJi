@@ -54,6 +54,11 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
         base.Update();
 
         
+        
+    }
+
+    private void LateUpdate()
+    {
         //开枪
         MakeFire();
     }
@@ -62,7 +67,12 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
     {
         if (Input.GetMouseButtonDown(0) && currentProp)
         {
-            currentProp.Using();
+            if (UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject)
+                Debug.Log("摸到按键了,别开枪 name = " + UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.name);
+            else
+            {
+                currentProp.Using();
+            }
         }
     }
 

@@ -35,7 +35,7 @@ public class aSongUI_Main : TTUIPage
         btn = backpackBtn.GetComponent<Button>();
         btn.onClick.AddListener(() =>
         {
-            TTUIPage.ShowPage<aSong_Backpack>();
+            TTUIPage.ShowPage<aSongUI_Backpack>();
         });
     }
 

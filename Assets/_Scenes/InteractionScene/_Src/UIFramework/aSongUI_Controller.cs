@@ -99,6 +99,11 @@ public class aSongUI_Controller {
 
     }
 
+    public int GetNum(PropName _name)
+    {
+        return int.Parse(jd[_name.ToString()]["num"].ToString());
+    }
+
     //ui中调用拾取:移除list中的model. 添加model 到对应的玩家背包list中
     public void PickupProp(int _propID)
     {
@@ -108,7 +113,9 @@ public class aSongUI_Controller {
             //从背包中拿出
             model = playerData.GetBagProp(_propID);
             Debug.Log("_propID = " + _propID);
-            if(playerData.CurrentModel !=null)
+            Debug.Log("_propID = " + model.name);
+
+            if (playerData.CurrentModel !=null)
                 Debug.Log("playerData.CurrentModel ID = " + playerData.CurrentModel.prop.propID);
             if (model == playerData.CurrentModel)
             {

@@ -3,53 +3,42 @@ using System.Collections.Generic;
 using UnityEngine;
 using TinyTeam.UI;
 using UnityEngine.UI;
-using DG.Tweening;
 
-public class aSong_UIPropList : TTUIPage
+public class aSongUI_Backpack : TTUIPage
 {
-    GameObject propList = null;
     GameObject propItem = null;
+    Text weightText;
+    aSongUI_BackpackWeapon leftWeapon;
+    aSongUI_BackpackWeapon rightWeapon;
+
+
     List<aSongUI_PropListItem> propItems = new List<aSongUI_PropListItem>();
     List<aSongUI_PropListItem> propItemsPool = new List<aSongUI_PropListItem>();
 
 
-    public bool b_showed = false;
-
-    public aSong_UIPropList() : base(UIType.Fixed, UIMode.DoNothing, UICollider.None)
+    public aSongUI_Backpack() : base(UIType.PopUp, UIMode.DoNothing, UICollider.None)
     {
-        uiPath = "UIPrefab/PropListGroup";
+        uiPath = "UIPrefab/Backpack";
     }
 
     public override void Awake(GameObject go)
     {
-        propList = this.transform.Find("PropList").gameObject;
-
-        propItem = this.transform.Find("PropList/Viewport/Content/Item").gameObject;
+        propItem = this.transform.Find("Storehouse/Scroll View/Viewport/Content/Item").gameObject;
         propItem.SetActive(false);
+
+        weightText = transform.Find("Storehouse/Instruction/Weight").GetComponent<Text>();
+        transform.Find("Storehouse/Instruction/Back").GetComponent<Button>().onClick.AddListener(()=>{
+            TTUIPage.ClosePage<aSongUI_Backpack>();
+        });
+
+        leftWeapon = transform.Find("Weapons/LeftWeapon").gameObject.AddComponent<aSongUI_BackpackWeapon>();
+        rightWeapon = transform.Find("Weapons/RightWeapon").gameObject.AddComponent<aSongUI_BackpackWeapon>();
+        leftWeapon.Init();
+        rightWeapon.Init();
     }
 
-    public override void Refresh()
-    {
-        if (b_showed)
-        {
-            Hide();
-            ShowPage();
-        }
-        else
-        {
-            propList.transform.localScale = Vector3.zero;
-            propList.transform.DOScale(new Vector3(1, 1, 1), 0.5f);
-            ShowPage();
-        }
-    }
-
-    /// <summary>
-    /// 隐藏,需要隐藏就代表着list中没有需要拾取的道具了
-    /// </summary>
     public override void Hide()
     {
-        //Debug.Log("Hide");
-        b_showed = false;
         for (int i = 0; i < propItems.Count; i++)
         {
             propItems[i].gameObject.SetActive(false);
@@ -58,23 +47,34 @@ public class aSong_UIPropList : TTUIPage
         propItems.Clear();
         this.gameObject.SetActive(false);
     }
-    
-    //道具还需要根据sort 进行排序. 1.各种类的枪,2.手枪,3.护甲装备,4.血包,6.炸弹......
-    //分两种：一种是已经拥有了的，一种是未拥有但是需要的.后一种全排在前一种的前面
+
+    public override void Active()
+    {
+        base.Active();
+        this.gameObject.SetActive(true);
+    }
+
+    public override void Refresh()
+    {
+        base.Refresh();
+        ShowPage();
+    }
+
     private void ShowPage()
     {
-        //Get Skill Data.
-        //NOTE:here,maybe you havent Show(...pageData),ofcause you can got your skill data from your data singleton
-        b_showed = true;
-        this.gameObject.SetActive(true);
         aSong_PlayerData propData = this.data != null ? this.data as aSong_PlayerData : aSongUI_Controller.Instance.playerData;
-        Debug.Log("propData.props.Count = " + propData.dic_listProp.Count);
-
-
-        var enumerator = propData.dic_listProp.GetEnumerator();
+        Debug.Log("propData.props.Count = " + propData.dic_bagProp.Count);
+        var enumerator = propData.dic_bagProp.GetEnumerator();
+        float countWeight = 0;
         while (enumerator.MoveNext())
         {
             AddPropToItem(enumerator.Current.Value.prop);
+            countWeight += enumerator.Current.Value.prop.weight* enumerator.Current.Value.prop.num;
+            weightText.text = countWeight+"/20";
+        }
+        foreach(var item in propData.Guns)
+        {
+            leftWeapon.Refresh(item.prop);
         }
     }
 
@@ -113,6 +113,5 @@ public class aSong_UIPropList : TTUIPage
         go.AddComponent<Button>().onClick.AddListener(aSongUI_Controller.Instance.OnClickSkillItem);
     }
 
-    
-    
+   
 }

@@ -10,6 +10,8 @@ public class aSongUI_PropListItem : MonoBehaviour {
     private Image img;
     private Text currentBullets;
     private Text totalBbullets;
+    private Text num;
+
 
     private bool b_Iint = false;
 
@@ -23,6 +25,8 @@ public class aSongUI_PropListItem : MonoBehaviour {
             currentBullets.gameObject.SetActive(false);
         if(totalBbullets)
             totalBbullets.gameObject.SetActive(false);
+        if (num)
+            num.gameObject.SetActive(false);
     }
 
     void Init()
@@ -51,6 +55,11 @@ public class aSongUI_PropListItem : MonoBehaviour {
         {
             totalBbullets = this.transform.Find("totalBullets").GetComponent<Text>();
         }
+
+        if (num == null && this.transform.Find("num") != null)
+        {
+            num = this.transform.Find("num").GetComponent<Text>();
+        }
     }
 
     void UpdateItem()
@@ -66,6 +75,10 @@ public class aSongUI_PropListItem : MonoBehaviour {
 
         if (totalBbullets != null)
             totalBbullets.text = 20.ToString();
+
+        if (num != null)
+            num.text = data.num.ToString();
+       
     }
 
     public void Refresh(aSong_PlayerData.Prop prop)
