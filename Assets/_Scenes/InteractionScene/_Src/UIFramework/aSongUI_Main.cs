@@ -53,9 +53,14 @@ public class aSongUI_Main : TTUIPage
     public override void Refresh()
     {
         base.Refresh();
-        //Debug.Log("Refresh !!!!!!!!!!!!!!!!!!!!!");
+        Debug.Log("aSongUI_Main::Refresh !!!!!!!!!!!!!!!!!!!!!");
 
         aSong_PlayerData propData = this.data != null ? this.data as aSong_PlayerData : aSongUI_Controller.Instance.playerData;
+        if(propData.Guns[0])
+            playerWeapons.GetComponent<aSongUI_PropListItem>().Refresh(propData.Guns[0].prop);
+        if(propData.Guns[1])
+            playerWeapons_2.GetComponent<aSongUI_PropListItem>().Refresh(propData.Guns[1].prop);
+        /*
         if (propData.Guns.Count >= 1)
         {
             playerWeapons.GetComponent<aSongUI_PropListItem>().Refresh(propData.Guns[0].prop);
@@ -68,7 +73,7 @@ public class aSongUI_Main : TTUIPage
         }
         if(propData.Guns.Count >= 2)
             playerWeapons_2.GetComponent<aSongUI_PropListItem>().Refresh(propData.Guns[1].prop);
-        
+        */
     }
 
 }

@@ -5,13 +5,13 @@ using UnityEngine;
 //道具名. 
 public enum PropName
 {
-    M9, M416, M67 ,AK47,M14, bullets_9mm,  other
+    M9, M416, M67 ,AK47,M14, bullets_9mm, P1911,  other
 }
 
-//道具种类:射手步枪,冲锋枪,雷
+//道具种类:步枪,手枪,雷
 public enum PropType
 {
-    rifle, pistol, bomb, other
+    rifle, pistol, bomb, bullet, other
 }
 
 
@@ -24,6 +24,7 @@ public class aSong_PlayerData {
         public PropName name;
         public float weight;
         public int num;
+        public int maxNum;
         public static int idCount = 0;
         public Prop(PropName _name)
         {
@@ -34,11 +35,13 @@ public class aSong_PlayerData {
             type = aSongUI_Controller.Instance.GetPropType(_name);
             weight = aSongUI_Controller.Instance.GetWeight(_name);
             num = aSongUI_Controller.Instance.GetNum(_name);
+            maxNum = aSongUI_Controller.Instance.GetMaxNum(_name);
         }
 
         private Prop() { }
     }
 
+    
     //玩家拾取了的 Dic
     //list中的prop
     public Dic_PropModel dic_listProp;
@@ -84,78 +87,114 @@ public class aSong_PlayerData {
     {
         if (model == null || dic_bagProp.ContainsValue(model))
             return;
+        bool b_addToBackpack = true;
         switch (model.prop.type)
         {
             case PropType.bomb:
-                bombs.Add(model);
+                b_addToBackpack = AddPropToBackpack(model, bombs);
                 break;
             case PropType.pistol:
             case PropType.rifle:
                 PutWeaponInBackpack(model);
+                if (currentModel == null)
+                    currentModel = model;
+                break;
+            case PropType.bullet:
+                b_addToBackpack = AddPropToBackpack(model, bulletList);
                 break;
             case PropType.other:
 
                 break;
         }
-        if(currentModel == null)
-            currentModel = model;
-
-        dic_bagProp.Add(model.prop.propID, model);
+        
+        if(b_addToBackpack)
+            dic_bagProp.Add(model.prop.propID, model);
         return;
     }
 
-    void PutWeaponInBackpack(PropBaseModel model)
+    bool AddPropToBackpack(PropBaseModel model, List<PropBaseModel> list)
     {
-        if(currentModel)
-            Debug.Log("current = " + currentModel.name);
-        if(model)
-            Debug.Log("model = " + model.name);
-
-        if (guns.Count == 3)
+        if (list.Count >= 1)
         {
-            //背包满一定是:2把rifle 一把pistol
-            //背包满的判断:丢掉手上的,加入新拿的
-            if (currentModel.prop.type == PropType.rifle || currentModel.prop.type == PropType.pistol)
+            list[list.Count - 1].prop.num += model.prop.num;
+            if (list[list.Count - 1].prop.num > model.prop.maxNum)
             {
-                //手上拿的也是rifle,那么替换
-                dic_bagProp.Remove(currentModel.prop.propID);
-                for (int i = 0; i < guns.Count; i++)
-                {
-                    if (guns[i] == currentModel)
-                    {
-                        guns[i] = model;
-                    }
-                }
-                currentModel = model;
+                list.Add(model);
+                list[bombs.Count - 1].prop.num = model.prop.maxNum;
+                model.prop.num = list[list.Count - 1].prop.num - model.prop.maxNum;
+                return true;
+            }
+            else
+            {
+                //没有被加入背包的model,应该被缓存池回收
             }
         }
         else
         {
-            Debug.Log("123321");
-            //背包不满的判断
-            int count = 0;
-            bool b_pisotl = false;
-            foreach (var item in guns)
+            list.Add(model);
+            return true;
+        }
+        return false;
+    }
+   
+    void PutWeaponInBackpack(PropBaseModel model)
+    {
+        if (currentModel)
+            Debug.Log("current = " + currentModel.name);
+        if(model)
+            Debug.Log("model = " + model.name);
+
+        int count_rifle = 0;
+        int index_pistol = -1;
+        for(int i = 0; i < guns.Count; i++)
+        {
+            if (guns[i] == null)
+                continue;
+            if (guns[i].prop.type == PropType.rifle)
+                count_rifle++;
+            if (guns[i].prop.type == PropType.pistol)
             {
-                if (item.prop.type == PropType.rifle)
-                    count++;
-                if (item.prop.type == PropType.pistol)
-                    b_pisotl = true;
+                index_pistol = i;
             }
-            if((model.prop.type == PropType.rifle && count==2) || (b_pisotl && model.prop.type == PropType.pistol))
+        }
+
+        if (model.prop.type == PropType.pistol)
+        {
+            //已经有手枪了
+            if (index_pistol >= 0)
             {
-                Debug.Log("1233211111111");
-
-                //如果有手枪并且当前拿取的是手枪；或者当前拿取的是rifle并且背包2把rifle了,那么丢掉道具
-                if (currentModel.prop.type == model.prop.type)
+                dic_bagProp.Remove(guns[index_pistol].prop.propID);
+                guns[index_pistol].Discard();
+                guns[index_pistol] = model;
+                if (currentModel != null && currentModel.prop.type == model.prop.type)
                 {
-                    Debug.Log("1233222222222");
-
-                    //手上拿跟拾取的是同类型的
+                    //手上拿的也是枪
+                    currentModel = model;
+                }
+            }
+            else //没有手枪,直接按顺序放入背包
+            {
+                PutWeaponIn(model);
+            }
+        }
+        if(model.prop.type == PropType.rifle)
+        {
+            //有手枪,然后背包里还有一把步枪.那么手枪要挪到第三格去
+            if (index_pistol >= 0 && count_rifle >= 1 && index_pistol!=2)
+            {
+                guns[2] = guns[index_pistol];
+                guns[index_pistol] = model;
+            }
+            if(count_rifle == 2)
+            {
+                //枪满了,手上拿的也刚好是步枪,丢掉手上的,拾取地上的
+                if (currentModel != null && currentModel.prop.type == PropType.rifle)
+                {
+                    //手上拿的是步枪,移除手上的
                     dic_bagProp.Remove(currentModel.prop.propID);
+                    currentModel.Discard();
                     for (int i = 0; i < guns.Count; i++)
                     {
-                        //寻找currentModel在guns中的位置
                         if (guns[i] == currentModel)
                         {
                             guns[i] = model;
@@ -165,18 +204,55 @@ public class aSong_PlayerData {
                 }
                 else
                 {
-                    //手上拿的不是拾取类型的,那么直接移除然后加入新的
+                    //手上拿的不是步枪
                     dic_bagProp.Remove(guns[0].prop.propID);
+                    guns[0].Discard();
                     guns[0] = model;
                 }
             }
             else
             {
-                guns.Add(model);
+                //枪格子没满的时候,不用管手上拿的是啥,都直接放入背包
+                PutWeaponIn(model);
             }
         }
     }
 
+    /// <summary>
+    /// 按顺序放入
+    /// </summary>
+    /// <param name="model"></param>
+    void PutWeaponIn(PropBaseModel model)
+    {
+        for(int i = 0; i < guns.Count; i++)
+        {
+            if (guns[i] == null)
+            {
+                guns[i] = model;
+                break;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 获取当前拿在手上武器在guns中的index
+    /// </summary>
+    /// <returns></returns>
+    int GetCurrentGunIndex()
+    {
+        for (int i = 0; i < guns.Count; i++)
+        {
+            //说明手上拿的是枪
+            if (currentModel == guns[i])
+                return i;
+        }
+        return -1;
+    }
+
+    /// <summary>
+    /// 从背包中移除指定的model
+    /// </summary>
+    /// <param name="model"></param>
     public void RemoveBagProp(PropBaseModel model)
     {
         if (model == null || !dic_bagProp.ContainsValue(model))
@@ -201,34 +277,56 @@ public class aSong_PlayerData {
         return model;
     }
 
-    public bool IsBagFull(PropBaseModel model)
+    /// <summary>
+    /// 判断背包是否满了
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    public bool IsBagFull(PropType type)
     {
-        bool b_Discard = false;
+        bool isFull = false;
 
-        switch (model.prop.type)
+        switch (type)
         {
             case PropType.pistol:
-                if (pistol != null)
-                    b_Discard = true;
+                foreach (var item in guns)
+                { 
+                    if (item == null)
+                        continue;
+                    if (item.prop.type == PropType.pistol)
+                            isFull = true;
+                }
                 break;
             case PropType.rifle:
-                if (GetGunNum() >= 3)
-                    b_Discard = true;
+                int count = 0;
+                foreach (var item in guns)
+                {
+                    if (item == null)
+                        continue;
+                    if (item.prop.type == PropType.rifle)
+                        count++;
+                }
+                isFull = count == 2;
                 break;
             case PropType.bomb:
-                b_Discard = false;
+                isFull = false;
                 break;
             case PropType.other:
                 break;
         }
-        return b_Discard;
+        return isFull;
     }
 
     private PropBaseModel currentModel;
-    private List<PropBaseModel> guns = new List<PropBaseModel>();
+    private List<PropBaseModel> guns = new List<PropBaseModel>() { null, null,null};
     private PropBaseModel pistol= new PropBaseModel();
     private List<PropBaseModel> healths = new List<PropBaseModel>();
     private List<PropBaseModel> bombs = new List<PropBaseModel>();
+    //这只是一种子弹的list
+    private List<PropBaseModel> bulletList = new List<PropBaseModel>();
+    
+    //使用这个方便寻找对应model的list
+    //private Dictionary<PropName, List<PropBaseModel>> dic_addableModelList = new Dictionary<PropName, List<PropBaseModel>>();
 
     public List<PropBaseModel> Guns
     {
@@ -277,7 +375,15 @@ public class aSong_PlayerData {
 
     public int GetGunNum()
     {
-        return Guns.Count;
+        int count = 0;
+        foreach(var item in guns)
+        {
+            if (item != null)
+                count++;
+        }
+        return count;
     }
+
+
 
 }

@@ -70,12 +70,12 @@ public class aSongUI_Backpack : TTUIPage
         {
             AddPropToItem(enumerator.Current.Value.prop);
             countWeight += enumerator.Current.Value.prop.weight* enumerator.Current.Value.prop.num;
-            weightText.text = countWeight+"/20";
+            weightText.text = countWeight+"/200";
         }
-        foreach(var item in propData.Guns)
-        {
-            leftWeapon.Refresh(item.prop);
-        }
+        if(propData.Guns[0])
+            leftWeapon.Refresh(propData.Guns[0].prop);
+        if (propData.Guns[1])
+            rightWeapon.Refresh(propData.Guns[1].prop);
     }
 
     private void AddPropToItem(aSong_PlayerData.Prop prop)
@@ -110,7 +110,7 @@ public class aSongUI_Backpack : TTUIPage
         propItems.Add(item);
         Debug.Log("CreatePropItem");
         //add click btn
-        go.AddComponent<Button>().onClick.AddListener(aSongUI_Controller.Instance.OnClickSkillItem);
+        //go.AddComponent<Button>().onClick.AddListener(aSongUI_Controller.Instance.OnClickSkillItem);
     }
 
    

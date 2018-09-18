@@ -76,15 +76,33 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
         }
     }
 
+    void PutPropInBag(PropBaseModel prop)
+    {
+        prop.transform.parent = weaponPoint[0];
+        prop.transform.localPosition = Vector3.zero;
+        prop.transform.localEulerAngles = Vector3.zero;
+    }
 
-    //控制器只负责手上的道具,手上有道具时该丢的丢该放背包的放背包
-    void PutCurrentInBag()
+    public bool CanPickup()
+    {
+        if (interactionSystem.IsInInteraction(FullBodyBipedEffector.RightHand))
+        {
+            //Debug.LogError("我在动画中不方便拿东西");
+            return false;
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// 手上空的时候,停止抓取的动画
+    /// </summary>
+    void StopGrabAnimation()
     {
         animator.SetLayerWeight(1, 0);
         interactionSystem.StopInteraction(FullBodyBipedEffector.RightHand);
         interactionSystem.StopInteraction(FullBodyBipedEffector.LeftHand);
 
-        
+
         var poser = animator.GetBoneTransform(HumanBodyBones.RightHand).GetComponent<Poser>();
         if (poser != null)
         {
@@ -99,20 +117,51 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
         }
     }
 
-    void PutPropInBag(PropBaseModel prop)
+
+    void StartGrabAnimation(PropBaseModel model)
     {
-        prop.transform.parent = weaponPoint[0];
-        prop.transform.localPosition = Vector3.zero;
-        prop.transform.localEulerAngles = Vector3.zero;
+        InteractionObject _obj = model.mInteractionObject;
+        interactionSystem.StartInteraction(FullBodyBipedEffector.RightHand, _obj, false);
+        interactionSystem.StartInteraction(FullBodyBipedEffector.LeftHand, _obj, false);
+        if (model.prop.name == PropName.M416)
+        {
+            animator.SetLayerWeight(1, 1);
+        }
+        else
+        {
+            animator.SetLayerWeight(1, 0);
+        }
     }
 
+    /// <summary>
+    /// 抓取指定道具到手上
+    /// </summary>
+    /// <param name="model"></param>
+    public void PickupProp(PropBaseModel model)
+    {
+        currentProp = model;
+        model.PickupBy(gameObject);
+        StartGrabAnimation(model);
+    }
+
+    public void PutPropInBackpack(PropBaseModel model)
+    {
+        currentProp = null;
+        PutPropInBag(model);
+        model.PickupBy(gameObject);
+        StopGrabAnimation();
+    }
+
+    /// <summary>
+    /// 人物控制,拾取道具,只在乎手上是否有道具,手上道具是丢到,还是重新拾取还是放入背包
+    /// 只需要参数:1.要拾取的道具,拿在手上; 2.要放入背包的道具.
+    /// </summary>
+    /// <param name="current">当前手上的道具</param>
+    /// <param name="model">被选中的道具</param>
+    /// <param name="b_propFromBag"></param>
+    /// <returns></returns>
     public bool PickupProp(PropBaseModel current, PropBaseModel model, bool b_propFromBag = false)
     {
-        if (interactionSystem.IsInInteraction(FullBodyBipedEffector.RightHand))
-        {
-            //Debug.LogError("我在动画中不方便拿东西");
-            return false;
-        }
 
         bool b_IsBagFull = false;
         bool b_needGrab = true;
@@ -123,7 +172,7 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
             if (current != null)
             {
                 PutPropInBag(current);
-                PutCurrentInBag();
+                StopGrabAnimation();
                 b_needGrab = true;
             }
             //这个是要拿的东西为空,说明只是打算把手上的道具收回背包，直接返回
@@ -133,9 +182,9 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
             }
         }
 
-        b_IsBagFull = aSongUI_Controller.Instance.playerData.IsBagFull(model);
+        b_IsBagFull = aSongUI_Controller.Instance.playerData.IsBagFull(model.prop.type);
 
-        model.Pickup(gameObject);
+        model.PickupBy(gameObject);
         if (!b_IsBagFull)
         {
             //背包没满
@@ -153,13 +202,14 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
             if (!b_propFromBag)
             {
                 //从地上捡起来道具，丢掉手上的
-                current.Discard();
+                //current.Discard();
             }
-           
         }
 
         if (b_needGrab)
         {
+            StartGrabAnimation(model);
+            /*
             InteractionObject _obj = model.mInteractionObject;
             interactionSystem.StartInteraction(FullBodyBipedEffector.RightHand, _obj, false);
             interactionSystem.StartInteraction(FullBodyBipedEffector.LeftHand, _obj, false);
@@ -171,6 +221,7 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
             {
                 animator.SetLayerWeight(1, 0);
             }
+            */
         }
         return true;
     }

@@ -104,40 +104,64 @@ public class aSongUI_Controller {
         return int.Parse(jd[_name.ToString()]["num"].ToString());
     }
 
+    public int GetMaxNum(PropName _name)
+    {
+        return int.Parse(jd[_name.ToString()]["maxNum"].ToString());
+    }
+
     //ui中调用拾取:移除list中的model. 添加model 到对应的玩家背包list中
     public void PickupProp(int _propID)
     {
+        //执行动画过程中,不宜拿道具
+        if (!mUserCtrl.CanPickup())
+            return;
         PropBaseModel model;
         if (playerData.PropInBag(_propID))
         {
             //从背包中拿出
             model = playerData.GetBagProp(_propID);
-            Debug.Log("_propID = " + _propID);
-            Debug.Log("_propID = " + model.name);
+            Debug.Log("_propID = " + _propID + " |name = " + model.name);
 
             if (playerData.CurrentModel !=null)
-                Debug.Log("playerData.CurrentModel ID = " + playerData.CurrentModel.prop.propID);
+                Debug.Log("playerData.CurrentModel ID = " + playerData.CurrentModel.prop.propID + "| current name = " + playerData.CurrentModel.name);
+
             if (model == playerData.CurrentModel)
             {
                 //当前拿的就是这把武器,那么就收起放背后
-                model = null;
+                mUserCtrl.PutPropInBackpack(model);
+                playerData.CurrentModel = null;
                 Debug.Log("放背后呀");
             }
-            if (mUserCtrl.PickupProp(playerData.CurrentModel, model, true))
+            else
             {
-                //AddPropToBag(model);
-                //RemovePropFromList(model);
+                if(playerData.CurrentModel)
+                    mUserCtrl.PutPropInBackpack(playerData.CurrentModel);
+                mUserCtrl.PickupProp(model);
                 playerData.CurrentModel = model;
-
-                TTUIPage.ShowPage<aSongUI_Main>();
-                return;
             }
+            TTUIPage.ShowPage<aSongUI_Main>();
+            return;
         }
 
         if (playerData.PropInList(_propID))
         {
-            //list里面更新的话就需要
+            //list里面更新的话就只需要判断背包是否满了,满了就替换
             model = playerData.GetListProp(_propID);
+            AddPropToBag(model);
+            RemovePropFromList(model);
+            //换手了
+            if (model == playerData.CurrentModel)
+            {
+                mUserCtrl.PickupProp(model);
+            }
+            else
+            {
+                mUserCtrl.PutPropInBackpack(model);
+            }
+            TTUIPage.ShowPage<aSongUI_Main>();
+
+          
+            /*
             if (mUserCtrl.PickupProp(playerData.CurrentModel,model))
             {
                 AddPropToBag(model);
@@ -145,6 +169,7 @@ public class aSongUI_Controller {
                 TTUIPage.ShowPage<aSongUI_Main>();
                 return;
             }
+            */
         }
     }
 
@@ -163,6 +188,7 @@ public class aSongUI_Controller {
         Debug.Log("Clicked name = " + UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.name);
         //Debug.Log("propID = " + item.data.propID);
         //Debug.Log("name = " + item.name);
-        PickupProp(item.data.propID);
+        if(item.data != null)
+            PickupProp(item.data.propID);
     }
 }

@@ -21,7 +21,7 @@ public class PropBaseModel : MonoBehaviour {
         r = GetComponent<Rigidbody>();
     }
 
-    public void Pickup(GameObject player)
+    public void PickupBy(GameObject player)
     {
         if (r != null)
         {
