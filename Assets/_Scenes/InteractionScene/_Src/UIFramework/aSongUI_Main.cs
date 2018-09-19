@@ -35,7 +35,8 @@ public class aSongUI_Main : TTUIPage
         btn = backpackBtn.GetComponent<Button>();
         btn.onClick.AddListener(() =>
         {
-            TTUIPage.ShowPage<aSongUI_Backpack>();
+            //TTUIPage.ShowPage<aSongUI_Backpack>();
+            aSongUI_Controller.Instance.OnClickBackpack();
         });
     }
 
@@ -60,20 +61,6 @@ public class aSongUI_Main : TTUIPage
             playerWeapons.GetComponent<aSongUI_PropListItem>().Refresh(propData.Guns[0].prop);
         if(propData.Guns[1])
             playerWeapons_2.GetComponent<aSongUI_PropListItem>().Refresh(propData.Guns[1].prop);
-        /*
-        if (propData.Guns.Count >= 1)
-        {
-            playerWeapons.GetComponent<aSongUI_PropListItem>().Refresh(propData.Guns[0].prop);
-
-        }
-        else
-        {
-            playerWeapons.GetComponent<aSongUI_PropListItem>().Refresh(null);
-            playerWeapons_2.GetComponent<aSongUI_PropListItem>().Refresh(null);
-        }
-        if(propData.Guns.Count >= 2)
-            playerWeapons_2.GetComponent<aSongUI_PropListItem>().Refresh(propData.Guns[1].prop);
-        */
     }
 
 }

@@ -39,40 +39,54 @@ public class aSongUI_Backpack : TTUIPage
 
     public override void Hide()
     {
-        for (int i = 0; i < propItems.Count; i++)
-        {
-            propItems[i].gameObject.SetActive(false);
-            propItemsPool.Add(propItems[i]);
-        }
-        propItems.Clear();
-        this.gameObject.SetActive(false);
+        base.Hide();
+        ResetData();
     }
 
     public override void Active()
     {
         base.Active();
-        this.gameObject.SetActive(true);
     }
 
     public override void Refresh()
     {
+       
         base.Refresh();
+        if (isActive())
+            ResetData();
         ShowPage();
+    }
+
+    void ResetData()
+    {
+        for (int i = 0; i < propItems.Count; i++)
+        {
+            propItems[i].gameObject.SetActive(false);
+            propItems[i].transform.position = Vector3.zero;
+            propItemsPool.Add(propItems[i]);
+        }
+        propItems.Clear();
     }
 
     private void ShowPage()
     {
         aSong_PlayerData propData = this.data != null ? this.data as aSong_PlayerData : aSongUI_Controller.Instance.playerData;
-        Debug.Log("propData.props.Count = " + propData.dic_bagProp.Count);
+        //Debug.Log("propData.props.Count = " + propData.dic_bagProp.Count);
         var enumerator = propData.dic_bagProp.GetEnumerator();
         float countWeight = 0;
         while (enumerator.MoveNext())
         {
+            Debug.Log("id = " + enumerator.Current.Value.prop.propID);
+            if (enumerator.Current.Value.prop.type == PropType.pistol || enumerator.Current.Value.prop.type == PropType.rifle)
+            {
+                continue;
+            }
+            countWeight += enumerator.Current.Value.prop.weight * enumerator.Current.Value.prop.num;
             AddPropToItem(enumerator.Current.Value.prop);
-            countWeight += enumerator.Current.Value.prop.weight* enumerator.Current.Value.prop.num;
-            weightText.text = countWeight+"/200";
         }
-        if(propData.Guns[0])
+        weightText.text = countWeight + "/200";
+
+        if (propData.Guns[0])
             leftWeapon.Refresh(propData.Guns[0].prop);
         if (propData.Guns[1])
             rightWeapon.Refresh(propData.Guns[1].prop);
@@ -94,6 +108,7 @@ public class aSongUI_Backpack : TTUIPage
         propItemsPool.Remove(item);
         propItems.Add(item);
         item.gameObject.SetActive(true);
+        item.transform.localPosition = (propItems.Count - 1) * -50 * Vector3.up;
         item.Refresh(prop);
         return;
     }
@@ -108,6 +123,7 @@ public class aSongUI_Backpack : TTUIPage
         aSongUI_PropListItem item = go.AddComponent<aSongUI_PropListItem>();
         item.Refresh(prop);
         propItems.Add(item);
+        item.transform.localPosition = (propItems.Count - 1) * -50 * Vector3.up;
         Debug.Log("CreatePropItem");
         //add click btn
         //go.AddComponent<Button>().onClick.AddListener(aSongUI_Controller.Instance.OnClickSkillItem);

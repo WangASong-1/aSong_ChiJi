@@ -26,6 +26,7 @@ public class aSongUI_Controller {
     public JsonData jd;
 
     private aSong_UIPropList mUIPropList;
+    private aSongUI_Backpack mUIBackpack;
 
     //这个应该用事件来做.
     public aSong_UserControlInteractions mUserCtrl;
@@ -38,7 +39,7 @@ public class aSongUI_Controller {
         playerData = new aSong_PlayerData();
         playerData.dic_listProp = new Dic_PropModel();
         playerData.dic_bagProp = new Dic_PropModel();
-        
+
     }
 
     //在武器范围内，添加需要拾取的武器到List中并刷新
@@ -49,8 +50,8 @@ public class aSongUI_Controller {
         
         RefreshPropList();
     }
+    
 
-  
     void RefreshPropList()
     {
         if (mUIPropList == null)
@@ -190,5 +191,40 @@ public class aSongUI_Controller {
         //Debug.Log("name = " + item.name);
         if(item.data != null)
             PickupProp(item.data.propID);
+    }
+
+    public void OnClickBackpack()
+    {
+        Debug.Log("点我点我");
+        if (mUIBackpack == null)
+        {
+            TTUIPage.ShowPage<aSongUI_Backpack>();
+            if (TTUIPage.allPages.ContainsKey("aSongUI_Backpack"))
+            {
+                mUIBackpack = (aSongUI_Backpack)TTUIPage.allPages["aSongUI_Backpack"];
+                Debug.Log("mUIBackpack = " + mUIBackpack.gameObject.name);
+            }
+
+        }
+        else
+        {
+            if (mUIBackpack.isActive())
+            {
+                mUIBackpack.Refresh();
+            }
+            else
+            {
+                TTUIPage.ShowPage<aSongUI_Backpack>();
+            }
+                
+        }
+    }
+
+    public void RefreshPlayerData()
+    {
+        if (mUIBackpack!= null && mUIBackpack.isActive())
+        {
+            mUIBackpack.Refresh();
+        }
     }
 }

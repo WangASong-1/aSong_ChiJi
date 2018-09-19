@@ -52,6 +52,7 @@ public class aSong_UIPropList : TTUIPage
         b_showed = false;
         for (int i = 0; i < propItems.Count; i++)
         {
+            propItems[i].transform.localPosition = Vector3.zero;
             propItems[i].gameObject.SetActive(false);
             propItemsPool.Add(propItems[i]);
         }
@@ -95,6 +96,7 @@ public class aSong_UIPropList : TTUIPage
         propItems.Add(item);
         item.gameObject.SetActive(true);
         item.Refresh(prop);
+        item.transform.localPosition = Vector3.up * -50 * (propItems.Count - 1);
         return;
     }
 
@@ -108,6 +110,7 @@ public class aSong_UIPropList : TTUIPage
         aSongUI_PropListItem item = go.AddComponent<aSongUI_PropListItem>();
         item.Refresh(prop);
         propItems.Add(item);
+        item.transform.localPosition = Vector3.up * -50 * (propItems.Count - 1);
         Debug.Log("CreatePropItem");
         //add click btn
         go.AddComponent<Button>().onClick.AddListener(aSongUI_Controller.Instance.OnClickSkillItem);
