@@ -188,7 +188,7 @@ public class aSongUI_Controller {
         aSongUI_PropListItem item = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.GetComponent<aSongUI_PropListItem>();
         Debug.Log("Clicked name = " + UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.name);
         //Debug.Log("propID = " + item.data.propID);
-        //Debug.Log("name = " + item.name);
+        Debug.Log("name = " + item.data.name.ToString());
         if(item.data != null)
             PickupProp(item.data.propID);
     }

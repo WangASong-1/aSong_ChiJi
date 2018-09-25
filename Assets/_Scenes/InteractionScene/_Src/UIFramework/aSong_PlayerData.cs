@@ -6,13 +6,16 @@ using UnityEngine;
 public enum PropName
 {
     M9, M416, M67 ,AK47,M14, bullet_9mm, P1911, bullet_12, bullet_45ACP, bullet_300, bullet_556, bullet_762, bullet_arrow,
-    health_painkiller, health_cola, health_adrenaline, health_bandage, health_firstAidKit, health_medkit, jerrican,  other
+    health_painkiller, health_cola, health_adrenaline, health_bandage, health_firstAidKit, health_medkit, jerrican,
+    Telescope_x2, Telescope_x3, Telescope_x4, Telescope_x6, Telescope_x8, Muzzle_1, GunHandle_1, CartridgeClip_1, Gunstock_1,
+    other
 }
 
 //道具种类:步枪,手枪,雷
+// parts : 配件类,是可以跟枪一样放入weapons格子的
 public enum PropType
 {
-    rifle, pistol, bomb, bullet, other
+    rifle, pistol, bomb, bullet, parts,health, other
 }
 
 
@@ -33,8 +36,8 @@ public class aSong_PlayerData {
             idCount++;
             name = _name;
             propID = idCount;
-            pic = Resources.Load<Sprite>(_name.ToString());
             type = aSongUI_Controller.Instance.GetPropType(_name);
+            pic = Resources.Load<Sprite>(type.ToString()+"/" + _name.ToString());
             weight = aSongUI_Controller.Instance.GetWeight(_name);
             num = aSongUI_Controller.Instance.GetNum(_name);
             maxNum = aSongUI_Controller.Instance.GetMaxNum(_name);
@@ -43,31 +46,36 @@ public class aSong_PlayerData {
         private Prop() { }
     }
 
-    
+    #region 拾取list
     //玩家拾取了的 Dic
     //list中的prop
     public Dic_PropModel dic_listProp;
-    //背包dic
-    public Dic_PropModel dic_bagProp;
 
-
+    /// <summary>
+    /// 判断指定id是否在list中
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     public bool PropInList(int id)
     {
         return dic_listProp.ContainsKey(id);
     }
 
+    /// <summary>
+    /// 根据id获取model
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     public PropBaseModel GetListProp(int id)
     {
         return dic_listProp[id];
     }
-    public bool PropInBag(int id)
-    {
-        return dic_bagProp.ContainsKey(id);
-    }
-    public PropBaseModel GetBagProp(int id)
-    {
-        return dic_bagProp[id];
-    }
+    
+    /// <summary>
+    /// 将指定的model加入到list中
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
     public bool AddListProp(PropBaseModel model)
     {
         if (model == null || dic_listProp.ContainsValue(model))
@@ -76,6 +84,11 @@ public class aSong_PlayerData {
         return true;
     }
 
+    /// <summary>
+    /// 移除指定的model
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
     public bool RemoveListProp(PropBaseModel model)
     {
         if (model == null || !dic_listProp.ContainsValue(model))
@@ -83,7 +96,40 @@ public class aSong_PlayerData {
         dic_listProp.Remove(model.prop.propID);
         return true;
     }
+    #endregion
 
+    #region 背包道具的基本操作
+    //背包dic
+    public Dic_PropModel dic_bagProp;
+
+    /// <summary>
+    /// 道具是否在背包中:检查两个1.dic_bagProp,2.guns
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public bool PropInBag(int id)
+    {
+        return dic_bagProp.ContainsKey(id) || GetWeaponFromBackpack(id);
+    }
+
+    /// <summary>
+    /// 获取指定id的model
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public PropBaseModel GetBagProp(int id)
+    {
+        if (!PropInBag(id))
+            return null;
+        PropBaseModel model = null;
+        if (dic_bagProp.ContainsKey(id))
+            model = dic_bagProp[id];
+        else
+        {
+            model = GetWeaponFromBackpack(id);
+        }
+        return model;
+    }
 
     /// <summary>
     /// 从背包中移除指定的model
@@ -136,8 +182,10 @@ public class aSong_PlayerData {
         if (b_addToBackpack)
         {
             dic_bagProp.Add(model.prop.propID, model);
-            aSongUI_Controller.Instance.RefreshPlayerData();
         }
+        //只要有加入背包的举动,就必须更新背包
+        aSongUI_Controller.Instance.RefreshPlayerData();
+
         return;
     }
 
@@ -307,6 +355,19 @@ public class aSong_PlayerData {
         }
     }
 
+    PropBaseModel GetWeaponFromBackpack(int id)
+    {
+        foreach(var item in guns)
+        {
+            if (item != null)
+            {
+                if (item.prop.propID == id)
+                    return item;
+            }
+        }
+        return null;
+    }
+
     /// <summary>
     /// 获取当前拿在手上武器在guns中的index
     /// </summary>
@@ -321,6 +382,19 @@ public class aSong_PlayerData {
         }
         return -1;
     }
+
+    bool IsWeaponInBackpack(int id)
+    {
+        foreach(var item in guns)
+        {
+            if (item == null)
+                continue;
+            if (item.prop.propID == id)
+                return true;
+        }
+        return false;
+    }
+    #endregion
 
     private PropBaseModel currentModel;
     private List<PropBaseModel> guns = new List<PropBaseModel>() { null, null,null};
