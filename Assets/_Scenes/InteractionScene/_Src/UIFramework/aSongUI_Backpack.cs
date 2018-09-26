@@ -101,7 +101,7 @@ public class aSongUI_Backpack : TTUIPage
             countWeight += enumerator.Current.Value.prop.weight * enumerator.Current.Value.prop.num;
             AddPropToItem(enumerator.Current.Value.prop);
         }
-        content.sizeDelta.Set(content.rect.width, propData.dic_listProp.Count * itemHeight);
+        content.sizeDelta = new Vector2(content.rect.width, propData.dic_listProp.Count * itemHeight);
         weightText.text = countWeight + "/200";
 
         if (propData.Guns[0])

@@ -4,6 +4,8 @@ using UnityEngine;
 using TinyTeam.UI;
 using UnityEngine.UI;
 using DG.Tweening;
+using UnityEngine.Profiling;
+using System;
 
 public class aSong_UIPropList : TTUIPage
 {
@@ -12,7 +14,7 @@ public class aSong_UIPropList : TTUIPage
     List<aSongUI_PropListItem> propItems = new List<aSongUI_PropListItem>();
     List<aSongUI_PropListItem> propItemsPool = new List<aSongUI_PropListItem>();
     RectTransform content;
-
+    
     public bool b_showed = false;
 
     private float itemHeight = 0f;
@@ -82,8 +84,16 @@ public class aSong_UIPropList : TTUIPage
         {
             AddPropToItem(enumerator.Current.Value.prop);
         }
-        content.sizeDelta.Set(content.rect.width, propData.dic_listProp.Count * itemHeight);
-       
+
+        //测试了new 赋值跟 普通赋值所占用时间;基础每个执行都花费3ms, 一万次,new增加了3ms,而赋值因为同一个所以不变
+        //Debug.Log("Start = " + DateTime.Now.Millisecond);
+        //for(int i = 0; i < 10000; i++)
+            content.sizeDelta = new Vector2(content.rect.width, propData.dic_listProp.Count * itemHeight);
+        //Debug.Log("Middle = " + DateTime.Now.Millisecond);
+        //for (int i = 0; i < 10000; i++)
+            b_showed = true;
+        //Debug.Log("End = " + DateTime.Now.Millisecond);
+
     }
 
     private void AddPropToItem(aSong_PlayerData.Prop prop)
