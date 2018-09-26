@@ -15,6 +15,8 @@ public class aSongUI_Backpack : TTUIPage
     List<aSongUI_PropListItem> propItems = new List<aSongUI_PropListItem>();
     List<aSongUI_PropListItem> propItemsPool = new List<aSongUI_PropListItem>();
 
+    RectTransform content;
+    private float itemHeight = 0f;
 
     public aSongUI_Backpack() : base(UIType.PopUp, UIMode.DoNothing, UICollider.None)
     {
@@ -25,6 +27,9 @@ public class aSongUI_Backpack : TTUIPage
     {
         propItem = this.transform.Find("Storehouse/Scroll View/Viewport/Content/Item").gameObject;
         propItem.SetActive(false);
+        itemHeight = propItem.GetComponent<RectTransform>().rect.height;
+
+        content = this.transform.Find("Storehouse/Scroll View/Viewport/Content").GetComponent<RectTransform>();
 
         weightText = transform.Find("Storehouse/Instruction/Weight").GetComponent<Text>();
         transform.Find("Storehouse/Instruction/Back").GetComponent<Button>().onClick.AddListener(()=>{
@@ -35,6 +40,8 @@ public class aSongUI_Backpack : TTUIPage
         rightWeapon = transform.Find("Weapons/RightWeapon").gameObject.AddComponent<aSongUI_BackpackWeapon>();
         leftWeapon.Init();
         rightWeapon.Init();
+
+        
     }
 
     public override void Hide()
@@ -68,6 +75,16 @@ public class aSongUI_Backpack : TTUIPage
         propItems.Clear();
     }
 
+    void Discard(int _num = 0)
+    {
+
+    }
+
+    void PutOnParts(PropBaseModel _model)
+    {
+
+    }
+
     private void ShowPage()
     {
         aSong_PlayerData propData = this.data != null ? this.data as aSong_PlayerData : aSongUI_Controller.Instance.playerData;
@@ -84,6 +101,7 @@ public class aSongUI_Backpack : TTUIPage
             countWeight += enumerator.Current.Value.prop.weight * enumerator.Current.Value.prop.num;
             AddPropToItem(enumerator.Current.Value.prop);
         }
+        content.sizeDelta.Set(content.rect.width, propData.dic_listProp.Count * itemHeight);
         weightText.text = countWeight + "/200";
 
         if (propData.Guns[0])

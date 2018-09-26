@@ -99,7 +99,9 @@ public class aSong_PlayerData {
     #endregion
 
     #region 背包道具的基本操作
-    //背包dic
+    /// <summary>
+    /// 背包中显示的道具的 dic
+    /// </summary>
     public Dic_PropModel dic_bagProp;
 
     /// <summary>
@@ -397,9 +399,18 @@ public class aSong_PlayerData {
     #endregion
 
     private PropBaseModel currentModel;
+    /// <summary>
+    /// 武器list
+    /// </summary>
     private List<PropBaseModel> guns = new List<PropBaseModel>() { null, null,null};
     private PropBaseModel pistol= new PropBaseModel();
+    /// <summary>
+    /// 道具_恢复剂list
+    /// </summary>
     private List<PropBaseModel> healths = new List<PropBaseModel>();
+    /// <summary>
+    /// 道具_炸弹类list
+    /// </summary>
     private List<PropBaseModel> bombs = new List<PropBaseModel>();
     //这只是一种子弹的list
     private List<PropBaseModel> bulletList = new List<PropBaseModel>();

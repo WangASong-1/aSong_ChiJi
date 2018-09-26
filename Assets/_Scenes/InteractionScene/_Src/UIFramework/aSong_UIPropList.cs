@@ -11,9 +11,11 @@ public class aSong_UIPropList : TTUIPage
     GameObject propItem = null;
     List<aSongUI_PropListItem> propItems = new List<aSongUI_PropListItem>();
     List<aSongUI_PropListItem> propItemsPool = new List<aSongUI_PropListItem>();
-
+    RectTransform content;
 
     public bool b_showed = false;
+
+    private float itemHeight = 0f;
 
     public aSong_UIPropList() : base(UIType.Fixed, UIMode.DoNothing, UICollider.None)
     {
@@ -26,6 +28,9 @@ public class aSong_UIPropList : TTUIPage
 
         propItem = this.transform.Find("PropList/Viewport/Content/Item").gameObject;
         propItem.SetActive(false);
+        itemHeight = propItem.GetComponent<RectTransform>().rect.height;
+
+        content = this.transform.Find("PropList/Viewport/Content").GetComponent<RectTransform>();
     }
 
     public override void Refresh()
@@ -77,6 +82,8 @@ public class aSong_UIPropList : TTUIPage
         {
             AddPropToItem(enumerator.Current.Value.prop);
         }
+        content.sizeDelta.Set(content.rect.width, propData.dic_listProp.Count * itemHeight);
+       
     }
 
     private void AddPropToItem(aSong_PlayerData.Prop prop)
@@ -96,7 +103,7 @@ public class aSong_UIPropList : TTUIPage
         propItems.Add(item);
         item.gameObject.SetActive(true);
         item.Refresh(prop);
-        item.transform.localPosition = Vector3.up * -50 * (propItems.Count - 1);
+        item.transform.localPosition = Vector3.up * -item.GetComponent<RectTransform>().rect.height * (propItems.Count - 1);
         return;
     }
 
@@ -110,7 +117,7 @@ public class aSong_UIPropList : TTUIPage
         aSongUI_PropListItem item = go.AddComponent<aSongUI_PropListItem>();
         item.Refresh(prop);
         propItems.Add(item);
-        item.transform.localPosition = Vector3.up * -50 * (propItems.Count - 1);
+        item.transform.localPosition = Vector3.up * -item.GetComponent<RectTransform>().rect.height * (propItems.Count - 1);
         Debug.Log("CreatePropItem");
         //add click btn
         go.AddComponent<Button>().onClick.AddListener(aSongUI_Controller.Instance.OnClickSkillItem);
