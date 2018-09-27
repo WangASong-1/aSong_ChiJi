@@ -12,10 +12,10 @@ public enum PropName
 }
 
 //道具种类:步枪,手枪,雷
-// parts : 配件类,是可以跟枪一样放入weapons格子的
+//
 public enum PropType
 {
-    rifle, pistol, bomb, bullet, parts,health, other
+    rifle, pistol, bomb, bullet,health, telescope, muzzle, gunHandle, cartridgeClip, gunstock, other
 }
 
 
@@ -46,7 +46,7 @@ public class aSong_PlayerData {
         private Prop() { }
     }
 
-    #region 拾取list
+    #region 拾取list 定义以及基础操作
     //玩家拾取了的 Dic
     //list中的prop
     public Dic_PropModel dic_listProp;
@@ -96,6 +96,87 @@ public class aSong_PlayerData {
         dic_listProp.Remove(model.prop.propID);
         return true;
     }
+    #endregion
+
+
+    #region 背包其他道具定义
+    private PropBaseModel currentModel;
+    /// <summary>
+    /// 武器list
+    /// </summary>
+    private List<PropBaseModel> guns = new List<PropBaseModel>() { null, null, null };
+    private PropBaseModel pistol = new PropBaseModel();
+    /// <summary>
+    /// 道具_恢复剂list
+    /// </summary>
+    private List<PropBaseModel> healths = new List<PropBaseModel>();
+    /// <summary>
+    /// 道具_炸弹类list
+    /// </summary>
+    private List<PropBaseModel> bombs = new List<PropBaseModel>();
+    //这只是一种子弹的list
+    private List<PropBaseModel> bulletList = new List<PropBaseModel>();
+
+    //使用这个方便寻找对应model的list
+    //private Dictionary<PropName, List<PropBaseModel>> dic_addableModelList = new Dictionary<PropName, List<PropBaseModel>>();
+
+    public List<PropBaseModel> Guns
+    {
+        get
+        {
+            return guns;
+        }
+    }
+
+    public PropBaseModel Pistol
+    {
+        get
+        {
+            return pistol;
+        }
+    }
+
+    public List<PropBaseModel> Healths
+    {
+        get
+        {
+            return healths;
+        }
+    }
+
+    public List<PropBaseModel> Bombs
+    {
+        get
+        {
+            return bombs;
+        }
+    }
+
+    public PropBaseModel CurrentModel
+    {
+        get
+        {
+            return currentModel;
+        }
+
+        set
+        {
+            currentModel = value;
+        }
+    }
+
+    public int GetGunNum()
+    {
+        int count = 0;
+        foreach (var item in guns)
+        {
+            if (item != null)
+                count++;
+        }
+        return count;
+    }
+
+
     #endregion
 
     #region 背包道具的基本操作
@@ -397,83 +478,5 @@ public class aSong_PlayerData {
         return false;
     }
     #endregion
-
-    private PropBaseModel currentModel;
-    /// <summary>
-    /// 武器list
-    /// </summary>
-    private List<PropBaseModel> guns = new List<PropBaseModel>() { null, null,null};
-    private PropBaseModel pistol= new PropBaseModel();
-    /// <summary>
-    /// 道具_恢复剂list
-    /// </summary>
-    private List<PropBaseModel> healths = new List<PropBaseModel>();
-    /// <summary>
-    /// 道具_炸弹类list
-    /// </summary>
-    private List<PropBaseModel> bombs = new List<PropBaseModel>();
-    //这只是一种子弹的list
-    private List<PropBaseModel> bulletList = new List<PropBaseModel>();
-    
-    //使用这个方便寻找对应model的list
-    //private Dictionary<PropName, List<PropBaseModel>> dic_addableModelList = new Dictionary<PropName, List<PropBaseModel>>();
-
-    public List<PropBaseModel> Guns
-    {
-        get
-        {
-            return guns;
-        }
-    }
-
-    public PropBaseModel Pistol
-    {
-        get
-        {
-            return pistol;
-        }
-    }
-
-    public List<PropBaseModel> Healths
-    {
-        get
-        {
-            return healths;
-        }
-    }
-
-    public List<PropBaseModel> Bombs
-    {
-        get
-        {
-            return bombs;
-        }
-    }
-
-    public PropBaseModel CurrentModel
-    {
-        get
-        {
-            return currentModel;
-        }
-
-        set
-        {
-            currentModel = value;
-        }
-    }
-
-    public int GetGunNum()
-    {
-        int count = 0;
-        foreach(var item in guns)
-        {
-            if (item != null)
-                count++;
-        }
-        return count;
-    }
-
-
 
 }

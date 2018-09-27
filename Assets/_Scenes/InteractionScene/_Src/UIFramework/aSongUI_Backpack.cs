@@ -75,12 +75,81 @@ public class aSongUI_Backpack : TTUIPage
         propItems.Clear();
     }
 
+    void BackpackListButtonCliked()
+    {
+        aSongUI_PropListItem item = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.GetComponent<aSongUI_PropListItem>();
+        Debug.Log("Clicked name = " + UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.name);
+        //Debug.Log("propID = " + item.data.propID);
+        Debug.Log("name = " + item.data.name.ToString());
+        if (item.data != null)
+        {
+            //PickupProp(item.data.propID);
+            switch (item.data.type)
+            {
+                case PropType.bomb:
+                    break;
+                case PropType.bullet:
+                    break;
+                case PropType.cartridgeClip:
+                case PropType.gunHandle:
+                case PropType.gunstock:
+                case PropType.muzzle:
+                case PropType.telescope:
+                    PutOnParts(item.data);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 背包list中的丢弃按钮
+    /// </summary>
+    /// <param name="_num"></param>
     void Discard(int _num = 0)
     {
 
     }
 
-    void PutOnParts(PropBaseModel _model)
+    /// <summary>
+    /// 背包list中的装备配件按钮
+    /// </summary>
+    /// <param name="_prop"></param>
+    void PutOnParts(aSong_PlayerData.Prop _prop)
+    {
+        aSongUI_BackpackWeapon curentBackpackWeapon = GetCurrent_aSongUI_BackpackWeapon();
+        //当前没拿武器
+        if (!curentBackpackWeapon)
+            return;
+        if (!curentBackpackWeapon.CanPartsOn())
+        {
+            Debug.Log("11111111111111111");
+            curentBackpackWeapon.Reset();
+            return;
+        }
+        //先从数据中背包List删除
+        //再将道具引用放到aSongUI_BackpackWeapon对应的槽中
+        //aSongUI_Contact.m_instance
+        
+        PropBaseModel _model = aSongUI_Controller.Instance.playerData.GetBagProp(_prop.propID);
+        Debug.Log("装配件_model = " + _model.prop.name);
+        aSongUI_Controller.Instance.RemovePropFromBag(_model);
+        _model = curentBackpackWeapon.PutOnParts(_model);
+        if (_model)
+        {
+            Debug.Log("卸下来的道具 = " + _model.prop.name);
+            aSongUI_Controller.Instance.AddPropToBag(_model);
+        }
+            
+        
+    }
+
+    /// <summary>
+    /// 背包list中的使用按钮
+    /// </summary>
+    /// <param name="_prop"></param>
+    void UsingProp(aSong_PlayerData.Prop _prop)
     {
 
     }
@@ -105,9 +174,9 @@ public class aSongUI_Backpack : TTUIPage
         weightText.text = countWeight + "/200";
 
         if (propData.Guns[0])
-            leftWeapon.Refresh(propData.Guns[0].prop);
+            leftWeapon.PutOnWeapon(propData.Guns[0]);
         if (propData.Guns[1])
-            rightWeapon.Refresh(propData.Guns[1].prop);
+            rightWeapon.PutOnWeapon(propData.Guns[1]);
     }
 
     private void AddPropToItem(aSong_PlayerData.Prop prop)
@@ -145,7 +214,22 @@ public class aSongUI_Backpack : TTUIPage
         Debug.Log("CreatePropItem");
         //add click btn
         //go.AddComponent<Button>().onClick.AddListener(aSongUI_Controller.Instance.OnClickSkillItem);
+        go.AddComponent<Button>().onClick.AddListener(BackpackListButtonCliked);
+        
     }
 
-   
+    aSongUI_BackpackWeapon GetCurrent_aSongUI_BackpackWeapon()
+    {
+        aSongUI_BackpackWeapon backpackWeapon = null;
+        if(rightWeapon.CanPartsOn() && rightWeapon.GetWeaponModel() == aSongUI_Controller.Instance.CurrentModel)
+        {
+            backpackWeapon = rightWeapon;
+        }
+
+        if (leftWeapon.CanPartsOn() && leftWeapon.GetWeaponModel() == aSongUI_Controller.Instance.CurrentModel)
+        {
+            backpackWeapon = leftWeapon;
+        }
+        return backpackWeapon;
+    }
 }

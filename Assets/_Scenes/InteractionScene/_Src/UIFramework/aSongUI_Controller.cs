@@ -31,6 +31,13 @@ public class aSongUI_Controller {
     //这个应该用事件来做.
     public aSong_UserControlInteractions mUserCtrl;
 
+    public PropBaseModel CurrentModel
+    {
+        get
+        {
+            return playerData.CurrentModel;
+        }
+    }
 
     private aSongUI_Controller()
     {
@@ -79,12 +86,12 @@ public class aSongUI_Controller {
             RefreshPropList();
     }
 
-    void AddPropToBag(PropBaseModel _model)
+    public void AddPropToBag(PropBaseModel _model)
     {
         playerData.AddBagProp(_model);
     }
 
-    void RemovePropFromBag(PropBaseModel _model)
+    public void RemovePropFromBag(PropBaseModel _model)
     {
         playerData.RemoveBagProp(_model);
     }
