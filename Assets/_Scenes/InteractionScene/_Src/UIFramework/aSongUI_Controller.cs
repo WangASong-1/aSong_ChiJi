@@ -117,7 +117,11 @@ public class aSongUI_Controller {
         return int.Parse(jd[_name.ToString()]["maxNum"].ToString());
     }
 
-    //ui中调用拾取:移除list中的model. 添加model 到对应的玩家背包list中
+    /// <summary>
+    /// ui中调用拾取:移除list中的model. 添加model 到对应的玩家背包list中
+    /// 拾取和切换武器都是用该方法
+    /// </summary>
+    /// <param name="_propID"></param>
     public void PickupProp(int _propID)
     {
         //执行动画过程中,不宜拿道具
@@ -181,10 +185,15 @@ public class aSongUI_Controller {
         }
     }
 
+    /// <summary>
+    /// 丢掉背包里的
+    /// </summary>
+    /// <param name="_propID"></param>
     public void Discard(int _propID)
     {
-        PropBaseModel model = playerData.dic_listProp[_propID];
+        PropBaseModel model = playerData.dic_bagProp[_propID];
         RemovePropFromBag(model);
+        model.Discard();
     }
 
 

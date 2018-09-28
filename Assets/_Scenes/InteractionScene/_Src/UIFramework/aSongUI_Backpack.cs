@@ -11,12 +11,17 @@ public class aSongUI_Backpack : TTUIPage
     aSongUI_BackpackWeapon leftWeapon;
     aSongUI_BackpackWeapon rightWeapon;
 
-
+    /// <summary>
+    /// 背包道具列表
+    /// </summary>
     List<aSongUI_PropListItem> propItems = new List<aSongUI_PropListItem>();
     List<aSongUI_PropListItem> propItemsPool = new List<aSongUI_PropListItem>();
 
     RectTransform content;
     private float itemHeight = 0f;
+
+    private aSongUI_PropListItem btnItem;
+    private aSongUI_PropListItem choosedItem;
 
     public aSongUI_Backpack() : base(UIType.PopUp, UIMode.DoNothing, UICollider.None)
     {
@@ -28,6 +33,11 @@ public class aSongUI_Backpack : TTUIPage
         propItem = this.transform.Find("Storehouse/Scroll View/Viewport/Content/Item").gameObject;
         propItem.SetActive(false);
         itemHeight = propItem.GetComponent<RectTransform>().rect.height;
+
+        btnItem = this.transform.Find("Storehouse/Scroll View/Viewport/Content/Btn").gameObject.AddComponent<aSongUI_PropListItem>();
+        btnItem.gameObject.SetActive(false);
+        btnItem.transform.Find("PutOn").GetComponent<Button>().onClick.AddListener(BackpackListButton_PutOn);
+        btnItem.transform.Find("Discard").GetComponent<Button>().onClick.AddListener(Discard);
 
         content = this.transform.Find("Storehouse/Scroll View/Viewport/Content").GetComponent<RectTransform>();
 
@@ -64,8 +74,46 @@ public class aSongUI_Backpack : TTUIPage
         ShowPage();
     }
 
+    /// <summary>
+    /// 刷新list中道具位置
+    /// </summary>
+    public void RefreshBackpackScrow()
+    {
+        content.sizeDelta = new Vector2(content.rect.width, propItems.Count * itemHeight);
+        for (int i = 0; i < propItems.Count; i++)
+        {
+            propItems[i].transform.localPosition = i * -itemHeight * Vector3.up;
+        }
+    }
+    /// <summary>
+    /// 隐藏按钮Item
+    /// </summary>
+    void HideBtnItem()
+    {
+        choosedItem = null;
+        btnItem.gameObject.SetActive(false);
+        if(propItems.Contains(btnItem))
+            propItems.Remove(btnItem);
+    }
+
+    /// <summary>
+    /// 显示按钮Item
+    /// </summary>
+    /// <param name="_item">当前选中的item</param>
+    void ShowBtnItem(aSongUI_PropListItem _item)
+    {
+        choosedItem = _item;
+        btnItem.gameObject.SetActive(true);
+        propItems.Insert(propItems.IndexOf(choosedItem) + 1, btnItem);
+    }
+
+    /// <summary>
+    /// 重置列表数据
+    /// </summary>
     void ResetData()
     {
+        if (propItems.Contains(btnItem))
+            propItems.Remove(btnItem);
         for (int i = 0; i < propItems.Count; i++)
         {
             propItems[i].gameObject.SetActive(false);
@@ -75,12 +123,29 @@ public class aSongUI_Backpack : TTUIPage
         propItems.Clear();
     }
 
+    /// <summary>
+    /// 道具按键响应事件:显示还是隐藏BtnItem
+    /// </summary>
     void BackpackListButtonCliked()
     {
         aSongUI_PropListItem item = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.GetComponent<aSongUI_PropListItem>();
-        Debug.Log("Clicked name = " + UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.name);
-        //Debug.Log("propID = " + item.data.propID);
-        Debug.Log("name = " + item.data.name.ToString());
+        if(choosedItem != item)
+        {
+            ShowBtnItem(item);
+        }
+        else
+        {
+            HideBtnItem();
+        }
+        RefreshBackpackScrow();
+    }
+
+    /// <summary>
+    /// 按钮：装备
+    /// </summary>
+    void BackpackListButton_PutOn()
+    {
+        aSongUI_PropListItem item = choosedItem;
         if (item.data != null)
         {
             //PickupProp(item.data.propID);
@@ -103,28 +168,32 @@ public class aSongUI_Backpack : TTUIPage
         }
     }
 
+
     /// <summary>
-    /// 背包list中的丢弃按钮
+    /// 按钮：丢弃
     /// </summary>
     /// <param name="_num"></param>
-    void Discard(int _num = 0)
+    void Discard()
     {
-
+        Debug.Log("丢弃 = name " + choosedItem.data.name);
+        propItems.Remove(btnItem);
+        btnItem.gameObject.SetActive(false);
+        aSongUI_Controller.Instance.Discard(choosedItem.data.propID);
+        choosedItem = null;
     }
 
     /// <summary>
-    /// 背包list中的装备配件按钮
+    /// 背包list中的装备配件功能
     /// </summary>
     /// <param name="_prop"></param>
     void PutOnParts(aSong_PlayerData.Prop _prop)
     {
         aSongUI_BackpackWeapon curentBackpackWeapon = GetCurrent_aSongUI_BackpackWeapon();
-        //当前没拿武器
         if (!curentBackpackWeapon)
             return;
+        //当前没拿武器
         if (!curentBackpackWeapon.CanPartsOn())
         {
-            Debug.Log("11111111111111111");
             curentBackpackWeapon.Reset();
             return;
         }
@@ -141,8 +210,7 @@ public class aSongUI_Backpack : TTUIPage
             Debug.Log("卸下来的道具 = " + _model.prop.name);
             aSongUI_Controller.Instance.AddPropToBag(_model);
         }
-            
-        
+        HideBtnItem();
     }
 
     /// <summary>
@@ -160,17 +228,19 @@ public class aSongUI_Backpack : TTUIPage
         //Debug.Log("propData.props.Count = " + propData.dic_bagProp.Count);
         var enumerator = propData.dic_bagProp.GetEnumerator();
         float countWeight = 0;
+        //遍历背包,加载道具
         while (enumerator.MoveNext())
         {
-            Debug.Log("id = " + enumerator.Current.Value.prop.propID);
-            if (enumerator.Current.Value.prop.type == PropType.pistol || enumerator.Current.Value.prop.type == PropType.rifle)
-            {
-                continue;
-            }
+            Debug.Log("aSongUI_Backpack::ShowPage id = " + enumerator.Current.Value.prop.propID);
+            //if (enumerator.Current.Value.prop.type == PropType.pistol || enumerator.Current.Value.prop.type == PropType.rifle)
+            //{
+            //    continue;
+            //}
             countWeight += enumerator.Current.Value.prop.weight * enumerator.Current.Value.prop.num;
             AddPropToItem(enumerator.Current.Value.prop);
         }
-        content.sizeDelta = new Vector2(content.rect.width, propData.dic_listProp.Count * itemHeight);
+        RefreshBackpackScrow();
+        //content.sizeDelta = new Vector2(content.rect.width, propData.dic_bagProp.Count * itemHeight);
         weightText.text = countWeight + "/200";
 
         if (propData.Guns[0])
@@ -195,7 +265,7 @@ public class aSongUI_Backpack : TTUIPage
         propItemsPool.Remove(item);
         propItems.Add(item);
         item.gameObject.SetActive(true);
-        item.transform.localPosition = (propItems.Count - 1) * -50 * Vector3.up;
+        item.transform.localPosition = (propItems.Count - 1) * -itemHeight * Vector3.up;
         item.Refresh(prop);
         return;
     }
@@ -210,11 +280,16 @@ public class aSongUI_Backpack : TTUIPage
         aSongUI_PropListItem item = go.AddComponent<aSongUI_PropListItem>();
         item.Refresh(prop);
         propItems.Add(item);
-        item.transform.localPosition = (propItems.Count - 1) * -50 * Vector3.up;
+        item.transform.localPosition = (propItems.Count - 1) * -itemHeight * Vector3.up;
         Debug.Log("CreatePropItem");
         //add click btn
         //go.AddComponent<Button>().onClick.AddListener(aSongUI_Controller.Instance.OnClickSkillItem);
         go.AddComponent<Button>().onClick.AddListener(BackpackListButtonCliked);
+        
+    }
+
+    void CalcItemPosition()
+    {
         
     }
 
