@@ -144,14 +144,25 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
         StartGrabAnimation(model);
     }
 
+    /// <summary>
+    /// 将指定道具放入背包.(若放入的是当前拿取的道具,则停止动画)
+    /// </summary>
+    /// <param name="model"></param>
     public void PutPropInBackpack(PropBaseModel model)
     {
-        currentProp = null;
+        if (model == null)
+            return;
+        if(currentProp == model)
+        {
+            currentProp = null;
+            StopGrabAnimation();
+        }
         PutPropInBag(model);
         model.PickupBy(gameObject);
-        StopGrabAnimation();
     }
 
+
+    /*
     /// <summary>
     /// 人物控制,拾取道具,只在乎手上是否有道具,手上道具是丢到,还是重新拾取还是放入背包
     /// 只需要参数:1.要拾取的道具,拿在手上; 2.要放入背包的道具.
@@ -209,20 +220,8 @@ public class aSong_UserControlInteractions : UserControlThirdPerson
         if (b_needGrab)
         {
             StartGrabAnimation(model);
-            /*
-            InteractionObject _obj = model.mInteractionObject;
-            interactionSystem.StartInteraction(FullBodyBipedEffector.RightHand, _obj, false);
-            interactionSystem.StartInteraction(FullBodyBipedEffector.LeftHand, _obj, false);
-            if (model.prop.name == PropName.M416)
-            {
-                animator.SetLayerWeight(1, 1);
-            }
-            else
-            {
-                animator.SetLayerWeight(1, 0);
-            }
-            */
         }
         return true;
     }
+    */
 }

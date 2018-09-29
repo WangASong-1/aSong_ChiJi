@@ -180,7 +180,7 @@ public class aSongUI_Backpack : TTUIPage
         Debug.Log("丢弃 = name " + choosedItem.data.name);
         propItems.Remove(btnItem);
         btnItem.gameObject.SetActive(false);
-        aSongUI_Controller.Instance.Discard(choosedItem.data.propID);
+        aSongUI_Controller.Instance.Discard(choosedItem.data.propID,1);
         choosedItem = null;
     }
 
@@ -227,17 +227,14 @@ public class aSongUI_Backpack : TTUIPage
     private void ShowPage()
     {
         aSong_PlayerData propData = this.data != null ? this.data as aSong_PlayerData : aSongUI_Controller.Instance.playerData;
-        //Debug.Log("propData.props.Count = " + propData.dic_bagProp.Count);
+        Debug.Log("propData.props.Count = " + propData.dic_bagProp.Count);
         var enumerator = propData.dic_bagProp.GetEnumerator();
         float countWeight = 0;
         //遍历背包,加载道具
         while (enumerator.MoveNext())
         {
-            //Debug.Log("aSongUI_Backpack::ShowPage id = " + enumerator.Current.Value.prop.propID);
-            //if (enumerator.Current.Value.prop.type == PropType.pistol || enumerator.Current.Value.prop.type == PropType.rifle)
-            //{
-            //    continue;
-            //}
+            Debug.Log("aSongUI_Backpack::ShowPage id = " + enumerator.Current.Value.prop.name);
+           
             countWeight += enumerator.Current.Value.prop.weight * enumerator.Current.Value.prop.num;
             AddPropToItem(enumerator.Current.Value.prop);
         }

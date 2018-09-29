@@ -218,11 +218,30 @@ public class aSong_PlayerData {
     /// 从背包中移除指定的model
     /// </summary>
     /// <param name="model"></param>
-    public void RemoveBagProp(PropBaseModel model)
+    public void RemoveBagProp(PropBaseModel model, int _num = 1)
     {
         if (model == null || !dic_bagProp.ContainsValue(model))
             return;
-        dic_bagProp.Remove(model.prop.propID);
+        bool isDiscard = true;
+        switch (model.prop.type)
+        {
+            case PropType.bomb:
+                isDiscard = RemoveAddedProp(bombs, _num);
+                break;
+            case PropType.pistol:
+            case PropType.rifle:
+                break;
+            case PropType.bullet:
+                isDiscard = RemoveAddedProp(bulletList, _num);
+                break;
+            case PropType.other:
+                break;
+        }
+        if (isDiscard)
+        {
+            dic_bagProp.Remove(model.prop.propID);
+            model.Discard();
+        }
         aSongUI_Controller.Instance.RefreshPlayerData();
 
     }
@@ -231,8 +250,7 @@ public class aSong_PlayerData {
     {
         if (!dic_bagProp.ContainsKey(propID))
             return;
-        dic_bagProp.Remove(propID);
-        aSongUI_Controller.Instance.RefreshPlayerData();
+        RemoveBagProp(dic_bagProp[propID]);
     }
 
    
@@ -240,7 +258,10 @@ public class aSong_PlayerData {
     public void AddBagProp(PropBaseModel model)
     {
         if (model == null || dic_bagProp.ContainsValue(model))
+        {
+            Debug.LogError("aSong_PlayerData::AddBagProp 天哪,为神马加入不进来 model = " + model.prop.name);
             return;
+        }
         bool b_addToBackpack = true;
         switch (model.prop.type)
         {
@@ -272,20 +293,29 @@ public class aSong_PlayerData {
         return;
     }
 
+    /// <summary>
+    /// 有数量叠加的道具加入背包
+    /// </summary>
+    /// <param name="model"></param>
+    /// <param name="list"></param>
+    /// <returns></returns>
     bool AddPropToBackpack(PropBaseModel model, List<PropBaseModel> list)
     {
         if (list.Count >= 1)
         {
-            list[list.Count - 1].prop.num += model.prop.num;
-            if (list[list.Count - 1].prop.num > model.prop.maxNum)
+            PropBaseModel lastModel = list[list.Count - 1];
+            lastModel.prop.num += model.prop.num;
+            if (lastModel.prop.num > model.prop.maxNum)
             {
+                lastModel.prop.num = model.prop.maxNum;
                 list.Add(model);
-                list[bombs.Count - 1].prop.num = model.prop.maxNum;
-                model.prop.num = list[list.Count - 1].prop.num - model.prop.maxNum;
+                model.prop.num = lastModel.prop.num - model.prop.maxNum;
                 return true;
             }
             else
             {
+                model.Discard();
+                model.gameObject.SetActive(false);
                 //没有被加入背包的model,应该被缓存池回收
             }
         }
@@ -293,6 +323,34 @@ public class aSong_PlayerData {
         {
             list.Add(model);
             return true;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// 移除指定类型的prop从指定的list中
+    /// </summary>
+    /// <param name="list">道具list</param>
+    /// <param name="_num">丢掉的数量</param>
+    /// <returns>是否可以丢完</returns>
+    bool RemoveAddedProp(List<PropBaseModel> list,int _num)
+    {
+        if (_num <= 0)
+            return false;
+        if (list.Count >= 1)
+        {
+            PropBaseModel lastModel = list[list.Count - 1];
+            if(lastModel.prop.num > _num)
+            {
+                lastModel.prop.num -= _num;
+                return false;
+            }
+            else
+            {
+                //lastModel.prop.num = 0;
+                list.Remove(lastModel);
+                return true;
+            }
         }
         return false;
     }

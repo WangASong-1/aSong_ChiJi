@@ -91,9 +91,9 @@ public class aSongUI_Controller {
         playerData.AddBagProp(_model);
     }
 
-    public void RemovePropFromBag(PropBaseModel _model)
+    public void RemovePropFromBag(PropBaseModel _model,int _num = 1)
     {
-        playerData.RemoveBagProp(_model);
+        playerData.RemoveBagProp(_model, _num);
     }
 
     public PropType GetPropType(PropName _name)
@@ -159,29 +159,20 @@ public class aSongUI_Controller {
         {
             //list里面更新的话就只需要判断背包是否满了,满了就替换
             model = playerData.GetListProp(_propID);
+            //加入背包,会修改当前拿取的对象
             AddPropToBag(model);
             RemovePropFromList(model);
-            //换手了
+            //在放入背包的时候,换手了,说明两者一样,那就需要人物拾取道具
             if (model == playerData.CurrentModel)
             {
                 mUserCtrl.PickupProp(model);
             }
-            else
+            else  
             {
+                //道具没有直接拿到手上,那么就直接放入背包
                 mUserCtrl.PutPropInBackpack(model);
             }
             TTUIPage.ShowPage<aSongUI_Main>();
-
-          
-            /*
-            if (mUserCtrl.PickupProp(playerData.CurrentModel,model))
-            {
-                AddPropToBag(model);
-                RemovePropFromList(model);
-                TTUIPage.ShowPage<aSongUI_Main>();
-                return;
-            }
-            */
         }
     }
 
@@ -189,11 +180,11 @@ public class aSongUI_Controller {
     /// 丢掉背包里的
     /// </summary>
     /// <param name="_propID"></param>
-    public void Discard(int _propID)
+    public void Discard(int _propID,int _num = 1)
     {
         PropBaseModel model = playerData.dic_bagProp[_propID];
-        RemovePropFromBag(model);
-        model.Discard();
+        RemovePropFromBag(model, _num);
+        //model.Discard();
     }
 
 
