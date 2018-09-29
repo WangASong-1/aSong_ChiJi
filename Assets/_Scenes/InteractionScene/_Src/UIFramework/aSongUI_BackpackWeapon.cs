@@ -68,11 +68,16 @@ public class aSongUI_BackpackWeapon : MonoBehaviour {
 
     public void PutOnWeapon(PropBaseModel _model)
     {
-        //刷新
-        if (!_model ||  (mModels[0] && _model != mModels[0]))
+        if (!_model )
         {
+            //卸下武器,清空配件
             Reset();
             return;
+        }
+        if((mModels[0] && _model != mModels[0]))
+        {
+            //Debug.Log("aSongUI_BackpackWeapon::PutOnWeapon  换武器了,清空配件");
+            Reset();
         }
         mModels[0] = _model;
         //清空凹槽,刷新重新显示

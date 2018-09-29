@@ -104,6 +104,8 @@ public class aSongUI_Backpack : TTUIPage
     {
         choosedItem = _item;
         btnItem.gameObject.SetActive(true);
+        if (propItems.Contains(btnItem))
+            propItems.Remove(btnItem);
         propItems.Insert(propItems.IndexOf(choosedItem) + 1, btnItem);
     }
 
@@ -231,7 +233,7 @@ public class aSongUI_Backpack : TTUIPage
         //遍历背包,加载道具
         while (enumerator.MoveNext())
         {
-            Debug.Log("aSongUI_Backpack::ShowPage id = " + enumerator.Current.Value.prop.propID);
+            //Debug.Log("aSongUI_Backpack::ShowPage id = " + enumerator.Current.Value.prop.propID);
             //if (enumerator.Current.Value.prop.type == PropType.pistol || enumerator.Current.Value.prop.type == PropType.rifle)
             //{
             //    continue;

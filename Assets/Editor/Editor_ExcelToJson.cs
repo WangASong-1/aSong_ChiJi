@@ -50,9 +50,14 @@ public class Editor_ExcelToJson : EditorWindow
                 return;
 
             DataSet result = reader.AsDataSet();
+
+
+
+            //读完excel数据后,转换为json
             if (result != null)
             {
-                Debug.Log("table0 = " + result.Tables[0].Columns);
+                Debug.Log("列 = " + result.Tables[0].Columns.Count);
+                Debug.Log("行 = " + result.Tables[0].Rows.Count);
             }
             int columns = result.Tables[0].Columns.Count;//获取列数
             int rows = result.Tables[0].Rows.Count;//获取行数
