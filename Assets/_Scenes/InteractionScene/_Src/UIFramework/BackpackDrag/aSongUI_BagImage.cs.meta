@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 761407de2ce1d304481ffbb8fb6c0238
+timeCreated: 1539239419
+licenseType: Pro
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - hair: {fileID: 21300000, guid: 48488eb9249c86e4d982be3330206ae3, type: 3}
+  - weapon: {fileID: 21300000, guid: 529fe3918e3691d44a0aa1ec3fe3a6b4, type: 3}
+  - foot: {fileID: 21300000, guid: 2e10622d32f71514db3cb988116df185, type: 3}
+  - UISprite: {fileID: 21300000, guid: 668140e62a751304292995efa4fc8b9a, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

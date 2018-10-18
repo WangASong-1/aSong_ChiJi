@@ -21,6 +21,7 @@ public class aSongUI_Backpack : TTUIPage
     private float itemHeight = 0f;
 
     private aSongUI_PropListItem btnItem;
+    private aSongUI_PropListItem usingItem;
     private aSongUI_PropListItem choosedItem;
 
     public aSongUI_Backpack() : base(UIType.PopUp, UIMode.DoNothing, UICollider.None)
@@ -38,6 +39,10 @@ public class aSongUI_Backpack : TTUIPage
         btnItem.gameObject.SetActive(false);
         btnItem.transform.Find("PutOn").GetComponent<Button>().onClick.AddListener(BackpackListButton_PutOn);
         btnItem.transform.Find("Discard").GetComponent<Button>().onClick.AddListener(Discard);
+
+        usingItem = this.transform.Find("Storehouse/Scroll View/Viewport/Content/Using").gameObject.AddComponent<aSongUI_PropListItem>();
+        usingItem.gameObject.SetActive(false);
+        usingItem.transform.Find("PutOn").GetComponent<Button>().onClick.AddListener(BackpackListButton_PutOn);
 
         content = this.transform.Find("Storehouse/Scroll View/Viewport/Content").GetComponent<RectTransform>();
 
@@ -103,6 +108,10 @@ public class aSongUI_Backpack : TTUIPage
     void ShowBtnItem(aSongUI_PropListItem _item)
     {
         choosedItem = _item;
+        if(choosedItem.data.type == PropType.health)
+        {
+
+        }
         btnItem.gameObject.SetActive(true);
         if (propItems.Contains(btnItem))
             propItems.Remove(btnItem);
@@ -174,14 +183,28 @@ public class aSongUI_Backpack : TTUIPage
     /// <summary>
     /// 按钮：丢弃
     /// </summary>
-    /// <param name="_num"></param>
     void Discard()
     {
         Debug.Log("丢弃 = name " + choosedItem.data.name);
-        propItems.Remove(btnItem);
-        btnItem.gameObject.SetActive(false);
+        HideBtnItem();
         aSongUI_Controller.Instance.Discard(choosedItem.data.propID,1);
-        choosedItem = null;
+    }
+
+    /// <summary>
+    /// 按钮：部分丢
+    /// </summary>
+    void DiscardParts()
+    {
+        Debug.Log("按钮：部分丢");
+    }
+
+    /// <summary>
+    /// 按钮：使用
+    /// </summary>
+    /// <param name="_prop"></param>
+    void UsingProp(aSong_PlayerData.Prop _prop)
+    {
+        Debug.Log("按钮：使用");
     }
 
     /// <summary>
@@ -215,14 +238,7 @@ public class aSongUI_Backpack : TTUIPage
         HideBtnItem();
     }
 
-    /// <summary>
-    /// 背包list中的使用按钮
-    /// </summary>
-    /// <param name="_prop"></param>
-    void UsingProp(aSong_PlayerData.Prop _prop)
-    {
-
-    }
+   
 
     private void ShowPage()
     {

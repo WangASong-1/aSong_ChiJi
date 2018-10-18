@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 7349b25833ddadc49acce7efc707cc20
+timeCreated: 1539240285
+licenseType: Pro
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - weapon: {fileID: 21300000, guid: 735a867a74a981b4faa4ec4867f7daec, type: 3}
+  - UISprite: {fileID: 21300000, guid: 668140e62a751304292995efa4fc8b9a, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

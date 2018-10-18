@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: d8c27f1b1ad6a664a8990cf250715c65
+timeCreated: 1539239598
+licenseType: Pro
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - none: {fileID: 21300000, guid: e92bf68076f6ea54da287dc3f87bccff, type: 3}
+  - hair: {fileID: 21300000, guid: 48488eb9249c86e4d982be3330206ae3, type: 3}
+  - weapon: {fileID: 21300000, guid: 529fe3918e3691d44a0aa1ec3fe3a6b4, type: 3}
+  - foot: {fileID: 21300000, guid: 2e10622d32f71514db3cb988116df185, type: 3}
+  - cam: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
