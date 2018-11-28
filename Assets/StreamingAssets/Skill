@@ -1,0 +1,5 @@
+skill(1)
+{
+	PlayAnimation(0,0,199);
+	PlayAnimation(3,0,222);
+}
